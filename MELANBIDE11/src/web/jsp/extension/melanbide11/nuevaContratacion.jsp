@@ -169,7 +169,7 @@
                 this.i_codigos = new Array();
                 this.i_items = new Array();
 
-                //Creamos la vista del combo, que ser· un DIV que incluir· la tabla con los elementos de la lista.
+                //Creamos la vista del combo, que ser√° un DIV que incluir√° la tabla con los elementos de la lista.
                 this.base = document.createElement("DIV");
                 this.base.combo = this;
                 this.base.style.position = 'absolute';
@@ -241,7 +241,7 @@
                     var rowID = 1;
 
                     if (!!navigator.userAgent.match(/Trident.*rv[ :]*11\./) || navigator.appName.indexOf("Internet Explorer") != -1) {
-                        // Se calcula la posiciÛn de item del combo que ha sido seleccionado
+                        // Se calcula la posici√≥n de item del combo que ha sido seleccionado
                         var i = padre.parentElement.sourceIndex;
                         var j = padre.sourceIndex;
                         rowID = (j - i - 1);
@@ -249,7 +249,7 @@
                     } else {
                         // Firefox u otro navegador
 
-                        /** Se obtiene el valor del item de men˙ seleccionado, para a partir de Èl, obtener la posiciÛn en el combo y seleccionar dicha fila **/
+                        /** Se obtiene el valor del item de men√∫ seleccionado, para a partir de √©l, obtener la posici√≥n en el combo y seleccionar dicha fila **/
                         var hijos = padre.childNodes;
                         var valorFilaSeleccionada = "";
                         if (hijos != null) {
@@ -266,7 +266,7 @@
                                 }
                             }
                         }
-                        // En z est· la posiciÛn de la fila seleccionada por el usuario
+                        // En z est√° la posici√≥n de la fila seleccionada por el usuario
                         rowID = z;
                     }// else       
 
@@ -556,7 +556,7 @@
                         this.selectItem(i);
                     } else {
                         if (this.des.readOnly)
-                            jsp_alerta('A', 'CÛdigo inexistente');
+                            jsp_alerta('A', 'C√≥digo inexistente');
                         this.selectItem(-1);
                         return false;
                     }
@@ -604,11 +604,11 @@
             }
 
             function quitarTildes(st) {
-                st = st.replace(new RegExp(/[‡·‚„‰Â]/g), "a");
-                st = st.replace(new RegExp(/[ËÈÍÎ]/g), "e");
-                st = st.replace(new RegExp(/[ÏÌÓÔ]/g), "i");
-                st = st.replace(new RegExp(/[ÚÛÙıˆ]/g), "o");
-                st = st.replace(new RegExp(/[˘˙˚¸]/g), "u");
+                st = st.replace(new RegExp(/[√†√°√¢√£√§√•]/g), "a");
+                st = st.replace(new RegExp(/[√®√©√™√´]/g), "e");
+                st = st.replace(new RegExp(/[√¨√≠√Æ√Ø]/g), "i");
+                st = st.replace(new RegExp(/[√≤√≥√¥√µ√∂]/g), "o");
+                st = st.replace(new RegExp(/[√π√∫√ª√º]/g), "u");
 
                 return st;
             }
@@ -640,7 +640,7 @@
                 var novoCodigos = [];
 
                 for (var i = 0; i < this.items.length; i++) {
-                    // se fuerza a que sea string (en el pantallaCatalogacion.jsp de catalogaciÛn no hizo falta)
+                    // se fuerza a que sea string (en el pantallaCatalogacion.jsp de catalogaci√≥n no hizo falta)
                     var itemTemp = this.items[i].toString().toLowerCase();
                     itemTemp = quitarTildes(itemTemp).toUpperCase();
                     //if (this.items[i].toString().toUpperCase().indexOf(this.des.introducido.toUpperCase()) >= 0) {
@@ -693,7 +693,7 @@
             }
 
 //********************************************************** //
-// Calculamos el tamaÒo y posicion que tendr· el Combo.      //
+// Calculamos el tama√±o y posicion que tendr√° el Combo.      //
 //***********************************************************//
             function CB_resize() {
 
