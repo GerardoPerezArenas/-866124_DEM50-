@@ -28,8 +28,13 @@ public class ConstantesMeLanbide11
     public static final String SEQ_MELANBIDE11_CONTRATACION="SEQ_MELANBIDE11_CONTRATACION";
     public static final String SEQ_MELANBIDE11_SUBSOLIC="SEQ_MELANBIDE11_SUBSOLIC";
     
-    //Constante para la clave del fichero de propiedades que indica el nombre del módulo.
-    public static final String NOMBRE_MODULO = "NOMBRE_MODULO";
+    public static final String ANEXO_TIT_REQ = "anexoA.titulacion.requerida";
+    public static final String ANEXO_TIT_REQ_OP1 = "anexoA.titulacion.requerida.op1";
+    public static final String ANEXO_TIT_REQ_OP2 = "anexoA.titulacion.requerida.op2";
+    public static final String ANEXO_TIT_REQ_OP3 = "anexoA.titulacion.requerida.op3";
+    public static final String ANEXO_TIT_REQ_OP4 = "anexoA.titulacion.requerida.op4";
+    public static final String ANEXO_TIT_REQ_OP5 = "anexoA.titulacion.requerida.op5";
+
     
     // Otros
     public static final String CARACTERES_ESPECIALES = "CARACTERES_ESPECIALES";
@@ -40,7 +45,7 @@ public class ConstantesMeLanbide11
     public static final String TABLA_CODIGOS_DESPLEGABLES_EXTERNOS="TABLA_CODIGOS_DESPLEGABLES_EXTERNOS";
     
     
-    // Códigos desplegables 
+    // CÃ³digos desplegables 
     public static final String COD_DES_SEXO = "COD_DES_SEXO";
     public static final String COD_DES_BOOL = "COD_DES_BOOL";
     public static final String COD_DES_JORN = "COD_DES_JORN";
@@ -48,7 +53,7 @@ public class ConstantesMeLanbide11
     public static final String COD_DES_DTRT = "COD_DES_DTRT";
     public static final String COD_DES_DTSV = "COD_DES_DTSV";
     
-    // Códigos deplegables externos
+    // CÃ³digos deplegables externos
     public static final String COD_DES_EXT_OCIN = "COD_DES_EXT_OCIN";
     public static final String COD_DES_EXT_TIIN= "COD_DES_EXT_TIIN";
     public static final String COD_DES_EXT_CPIN= "COD_DES_EXT_CPIN";
