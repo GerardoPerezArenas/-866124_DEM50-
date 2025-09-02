@@ -1,0 +1,8 @@
+Reversión de cambios en área SUBVENCIONES (minimis):
+- minimis.jsp: restauradas rutas de scripts a /scripts/extension/meLanbide11/JavaScriptUtil.js
+- minimis.jsp: restaurado patrón de comillas de addColumna con comillas dobles externas y claves escapadas.
+- Parsers.js: sin cambios (no se usa en minimis.jsp). Si deseas, puedo eliminarlo.
+
+No se ha ejecutado despliegue automático tras esta reversión. Ejecutar:
+- ant -f build-parche.xml desplegar
+para copiar a Tomcat cuando decidas.

@@ -1,0 +1,10 @@
+{
+  "version": "0.2.0",
+"configurations": [
+  
+
+  { "type": "java", "name": "Adjuntar a Tomcat (JPDA 8000)", "request": "attach", "hostName": "localhost", "port": 8000 },
+  { "name": "Depurar JVM 6 (adjuntar)", "type": "java", "request": "attach", "hostName": "localhost", "port": 5005 }
+]
+
+}

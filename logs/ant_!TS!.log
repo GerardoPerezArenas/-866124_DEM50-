@@ -1,0 +1,42 @@
+Buildfile: C:\DESARROLLO\FLEXIA\MELANBIDE11\build-parche.xml
+
+init:
+     [echo] 
+     [echo]             --------------------------------------------------------------------------------
+     [echo]             Ejecutando fichero build-parche.xml para el modulo externo "MELANBIDE11" ...
+     [echo]             --------------------------------------------------------------------------------
+     [echo]         
+
+cleanclasses:
+   [delete] Deleting directory C:\DESARROLLO\FLEXIA\MELANBIDE11\build
+
+compile:
+     [echo] 
+     [echo]             --------------------------------------------------------------------------------
+     [echo]             Compilando el modulo "MELANBIDE11"
+     [echo]             --------------------------------------------------------------------------------            
+     [echo]         
+    [mkdir] Created dir: C:\DESARROLLO\FLEXIA\MELANBIDE11\build\classes
+    [javac] C:\DESARROLLO\FLEXIA\MELANBIDE11\build-parche.xml:58: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] Compiling 12 source files to C:\DESARROLLO\FLEXIA\MELANBIDE11\build\classes
+    [javac] Note: C:\DESARROLLO\FLEXIA\MELANBIDE11\src\java\es\altia\flexia\integracion\moduloexterno\melanbide11\MELANBIDE11.java uses unchecked or unsafe operations.
+    [javac] Note: Recompile with -Xlint:unchecked for details.
+
+generarModulo:
+     [echo] 
+     [echo]             --------------------------------------------------------------------------------
+     [echo]             Generando el modulo con la estructura de parche de Flexia en ./build
+     [echo]             --------------------------------------------------------------------------------            
+     [echo]         
+     [copy] Copying 12 files to C:\DESARROLLO\FLEXIA\MELANBIDE11\build\flexia
+     [copy] Copying 1 file to C:\DESARROLLO\FLEXIA\MELANBIDE11\build\classes
+     [copy] Copying 5 files to C:\apache-tomcat-7.0.104-64Bit\webapps\Flexia18\scripts
+     [copy] Copying 2 files to C:\DESARROLLO\FLEXIA\MELANBIDE11\build\classes\es\altia\flexia\integracion\moduloexterno\MELANBIDE11\i18n\text
+
+desplegar:
+     [copy] Copying 6 files to C:\apache-tomcat-7.0.104-64Bit\webapps\Flexia18\jsp
+     [copy] Copying 1 file to C:\apache-tomcat-7.0.104-64Bit\webapps\Flexia18\css
+     [copy] Copying 15 files to C:\apache-tomcat-7.0.104-64Bit\webapps\Flexia18\WEB-INF\classes
+
+BUILD SUCCESSFUL
+Total time: 2 seconds

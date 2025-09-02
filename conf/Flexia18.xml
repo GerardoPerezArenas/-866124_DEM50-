@@ -1,0 +1,74 @@
+<!-- FLEXIA18 DESA -->
+<Context crossContext="true" path="/Flexia18">
+<Resource
+  name="jdbc_flexia_generico"
+  auth="Container"
+  type="javax.sql.DataSource"
+  factory="org.apache.commons.dbcp.BasicDataSourceFactory"
+  driverClassName="oracle.jdbc.driver.OracleDriver"
+url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=172.16.64.16)(PORT=1530))(CONNECT_DATA=(SERVICE_NAME=LBDR.BATERA.LANBIDE.EUS)))"
+  username="flbgen"
+  password="flbgen"
+  initialSize="10"
+  maxActive="50"
+  maxIdle="2"
+  maxWait="5000"
+  logAbandoned="true"
+  removeAbandoned="true"
+  removeAbandonedTimeout="300"
+/>
+
+  <Resource
+    name="jdbc_flexia_pruebas"
+    auth="Container"
+    type="javax.sql.DataSource"
+    factory="org.apache.commons.dbcp.BasicDataSourceFactory"
+    driverClassName="oracle.jdbc.driver.OracleDriver"
+url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=172.16.64.16)(PORT=1530))(CONNECT_DATA=(SERVICE_NAME=LBDR.BATERA.LANBIDE.EUS)))"
+    username="flbpru"
+    password="flbpru"
+    initialSize="10"
+    maxActive="50"
+    maxIdle="2"
+    maxWait="5000"
+    logAbandoned="true"
+    removeAbandoned="true"
+    removeAbandonedTimeout="300"
+  />
+
+  <Resource
+    name="jdbc_flexia_organizacion"
+    auth="Container"
+    type="javax.sql.DataSource"
+    factory="org.apache.commons.dbcp.BasicDataSourceFactory"
+    driverClassName="oracle.jdbc.driver.OracleDriver"
+url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=172.16.64.16)(PORT=1530))(CONNECT_DATA=(SERVICE_NAME=LBDR.BATERA.LANBIDE.EUS)))"
+    username="flb"
+    password="flb"
+    initialSize="10"
+    maxActive="50"
+    maxIdle="2"
+    maxWait="5000"
+    logAbandoned="true"
+    removeAbandoned="true"
+    removeAbandonedTimeout="300"
+  />
+
+  <Resource
+    name="agora_lectura_jndi"
+    auth="Container"
+    type="javax.sql.DataSource"
+    factory="org.apache.commons.dbcp.BasicDataSourceFactory"
+    driverClassName="oracle.jdbc.driver.OracleDriver"
+url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=172.16.64.16)(PORT=1530))(CONNECT_DATA=(SERVICE_NAME=LBDR.BATERA.LANBIDE.EUS)))"
+    username="flbgen"
+    password="flbgen"
+    initialSize="10"
+    maxActive="50"
+    maxIdle="2"
+    maxWait="5000"
+    logAbandoned="true"
+    removeAbandoned="true"
+    removeAbandonedTimeout="300"
+  />
+</Context>

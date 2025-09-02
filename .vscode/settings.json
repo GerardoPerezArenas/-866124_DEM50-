@@ -1,0 +1,22 @@
+{
+  "java.configuration.runtimes": [
+    
+    {
+      "name": "JavaSE-1.6",
+      "path": "C:\\Java\\jdk1.6.0_45"
+    },
+    {
+      "name": "JavaSE-1.8",
+      "path": "C:\\Java\\jdk1.8.0_202",
+      "default": true
+    }
+  ],
+  "java.configuration.defaultRuntime": "JavaSE-1.8",
+  "java.import.gradle.enabled": false,
+  "java.import.maven.enabled": false,
+  "files.encoding": "windows1252",
+  "java.compile.nullAnalysis.mode": "disabled",
+  "CodeGPT.apiKey": "OpenAI",
+  "gitlens.ai.model": "openai:your-model-name",
+  "git.ignoreLimitWarning": true
+}
