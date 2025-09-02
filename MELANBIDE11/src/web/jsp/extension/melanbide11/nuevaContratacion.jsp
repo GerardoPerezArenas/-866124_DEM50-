@@ -1,5 +1,6 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@taglib uri="/WEB-INF/tlds/c.tld" prefix="c" %>
 
 <%@page import="es.altia.flexia.integracion.moduloexterno.melanbide11.i18n.MeLanbide11I18n" %>
@@ -2188,11 +2189,31 @@
                             <div>
                                 <input type="text" name="codListaTitulacion" id="codListaTitulacion" size="12" class="inputTexto" value="" onkeyup="xAMayusculas(this);" />
                                 <input type="text" name="descListaTitulacion"  id="descListaTitulacion" size="120" class="inputTexto" readonly="true" value="" />
-                                <a href="" id="anchorListaTitulacion" name="anchorListaTitulacion">
+                            <a href="" id="anchorListaTitulacion" name="anchorListaTitulacion">
                                     <span class="fa fa-chevron-circle-down" aria-hidden="true" id="botonAplicacion"
                                           name="botonAplicacion" style="cursor:pointer;"></span>
                                 </a>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="lineaFormulario">
+                        <div class="etiqueta" style="width: 250px; float: left;">
+                            <bean:message key="anexoA.titulacion.requerida"/>
+                        </div>
+                        <div>
+                            <logic:equal name="modoConsulta" value="true">
+                                <bean:write name="contratacionForm" property="titulacionRequeridaTexto"/>
+                            </logic:equal>
+                            <logic:notEqual name="modoConsulta" value="true">
+                                <html:select property="titulacionRequerida" styleClass="campo anchoXL" disabled="<%=modoConsulta%>">
+                                    <html:option value="OP1"><bean:message key="anexoA.titulacion.requerida.op1"/></html:option>
+                                    <html:option value="OP2"><bean:message key="anexoA.titulacion.requerida.op2"/></html:option>
+                                    <html:option value="OP3"><bean:message key="anexoA.titulacion.requerida.op3"/></html:option>
+                                    <html:option value="OP4"><bean:message key="anexoA.titulacion.requerida.op4"/></html:option>
+                                    <html:option value="OP5"><bean:message key="anexoA.titulacion.requerida.op5"/></html:option>
+                                </html:select>
+                            </logic:notEqual>
                         </div>
                     </div>
 
