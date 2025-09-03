@@ -4,12 +4,12 @@ package es.altia.flexia.integracion.moduloexterno.melanbide11.vo;
 import java.sql.Date;
 
 /*
-    CONTRATACIÓN: DATOS SELECCIÓN														
-                    NOFECONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Nº de oferta de Tipo1(excluyente): Selección mediante oferta (art. 6.1.a)	VARCHAR	10							
-                    IDCONT1	MELANBIDE11_CONTRATACION	MELANBIDE11	Id. Contrato de Tipo1(excluyente): Selección mediante oferta (art. 6.1.a)	VARCHAR	10							
-                    IDCONT2	MELANBIDE11_CONTRATACION	MELANBIDE11	Identificación de Contrato de Tipo2(excluyente): Selección directa de empresa (art. 6.1.b)	VARCHAR	10							
+    CONTRATACIï¿½N: DATOS SELECCIï¿½N														
+                    NOFECONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Nï¿½ de oferta de Tipo1(excluyente): Selecciï¿½n mediante oferta (art. 6.1.a)	VARCHAR	10							
+                    IDCONT1	MELANBIDE11_CONTRATACION	MELANBIDE11	Id. Contrato de Tipo1(excluyente): Selecciï¿½n mediante oferta (art. 6.1.a)	VARCHAR	10							
+                    IDCONT2	MELANBIDE11_CONTRATACION	MELANBIDE11	Identificaciï¿½n de Contrato de Tipo2(excluyente): Selecciï¿½n directa de empresa (art. 6.1.b)	VARCHAR	10							
 
-    CONTRATACIÓN: DATOS DE LA PERSONA CONTRATADA														
+    CONTRATACIï¿½N: DATOS DE LA PERSONA CONTRATADA														
                     DNICONT	MELANBIDE11_CONTRATACION	MELANBIDE11	DNI/NIE	VARCHAR	15	OBLIGATORIO						
                     NOMCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Nombre	VARCHAR	100	OBLIGATORIO						
                     APE1CONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Apellido1	VARCHAR	50	OBLIGATORIO						
@@ -17,47 +17,47 @@ import java.sql.Date;
                     FECHNACCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Fecha nacimiento	DATE		OBLIGATORIO						
                     EDADCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Edad	NUMBER	2	OBLIGATORIO						
                     SEXOCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Sexo (Desplegable)	VARCHAR	1	OBLIGATORIO	DESPLEGABLE SEXO					Valores posibles: 1: Hombre, 2: Mujer
-                    MAY55CONT	MELANBIDE11_CONTRATACION	MELANBIDE11	¿ Mayores de 55 años ? (Desplegable) SI=S, NO=N	VARCHAR	1	OBLIGATORIO	BOOLEANO (S/N)					Valores posibles: S N
-                    ACCFORCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	¿ Ha finalizado en 2019 una acción formativa con compromiso de contratación ? )Desplegable SI=S, NO=N	VARCHAR	1	OBLIGATORIO	BOOLEANO (S/N)					Valores posibles: S N
+                    MAY55CONT	MELANBIDE11_CONTRATACION	MELANBIDE11	ï¿½ Mayores de 55 aï¿½os ? (Desplegable) SI=S, NO=N	VARCHAR	1	OBLIGATORIO	BOOLEANO (S/N)					Valores posibles: S N
+                    ACCFORCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	ï¿½ Ha finalizado en 2019 una acciï¿½n formativa con compromiso de contrataciï¿½n ? )Desplegable SI=S, NO=N	VARCHAR	1	OBLIGATORIO	BOOLEANO (S/N)					Valores posibles: S N
 
-    CONTRATACIÓN: DATOS DEL PUESTO DE TRABAJO														
+    CONTRATACIï¿½N: DATOS DEL PUESTO DE TRABAJO														
                     PUESTOCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Nombre del puesto	VARCHAR	100	OBLIGATORIO						
-                    OCUCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Nombre de ocupación	VARCHAR	150	OBLIGATORIO						
-                    CODOCUCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Código de ocupación (Desplegable Intermediación)	VARCHAR	8	OBLIGATORIO	DESPLEGABLE EXTERNO OCIN					
-                    TITULACION	MELANBIDE11_CONTRATACION	MELANBIDE11	Titulación (Desplegable Intermediación)	VARCHAR	12	OBLIGATORIO	DESPLEGABLE EXTERNO TIIN					
-                    CPROFESIONALIDAD	MELANBIDE11_CONTRATACION	MELANBIDE11	Cert.Profesionalidad (Desplegable Intermediación)	VARCHAR	10	DESPLEGABLE EXTERNO CPIN
+                    OCUCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Nombre de ocupaciï¿½n	VARCHAR	150	OBLIGATORIO						
+                    CODOCUCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Cï¿½digo de ocupaciï¿½n (Desplegable Intermediaciï¿½n)	VARCHAR	8	OBLIGATORIO	DESPLEGABLE EXTERNO OCIN					
+                    TITULACION	MELANBIDE11_CONTRATACION	MELANBIDE11	Titulaciï¿½n (Desplegable Intermediaciï¿½n)	VARCHAR	12	OBLIGATORIO	DESPLEGABLE EXTERNO TIIN					
+                    CPROFESIONALIDAD	MELANBIDE11_CONTRATACION	MELANBIDE11	Cert.Profesionalidad (Desplegable Intermediaciï¿½n)	VARCHAR	10	DESPLEGABLE EXTERNO CPIN
                     MODCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Modalidad de contrato	VARCHAR	100	OBLIGATORIO						
-                    JORCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Jornada: Completa ó Parcial(mínimo 70%) (Desplegable)	VARCHAR	4	OBLIGATORIO	DESPLEGABLE JORN					
-                    PORCJOR	MELANBIDE11_CONTRATACION	MELANBIDE11	Porcentaje de Jornada Parcial(mínimo 70%) (en caso de Jornada Parcial)	NUMBER	5,2							
+                    JORCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Jornada: Completa ï¿½ Parcial(mï¿½nimo 70%) (Desplegable)	VARCHAR	4	OBLIGATORIO	DESPLEGABLE JORN					
+                    PORCJOR	MELANBIDE11_CONTRATACION	MELANBIDE11	Porcentaje de Jornada Parcial(mï¿½nimo 70%) (en caso de Jornada Parcial)	NUMBER	5,2							
                     FECHINICONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Fecha inicio del contrato	DATE		OBLIGATORIO						
                     FECHFINCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Fecha fin del contrato prevista(si procede)	DATE								
-                    DURCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Duración del contrato: en meses(excepto indefinido)	VARCHAR	6							
-                    GRSS	MELANBIDE11_CONTRATACION	MELANBIDE11	Grupo de cotización de la S.S. (Desplegable del 1 al 10)	VARCHAR	2	OBLIGATORIO	DESPLEGABLE GCOT					
-                    DIRCENTRCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Dirección de centro de trabajo de destino	VARCHAR	100	OBLIGATORIO						
-                    NSSCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Número de cuenta de cotización de la S.S.	VARCHAR	22	OBLIGATORIO						
+                    DURCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Duraciï¿½n del contrato: en meses(excepto indefinido)	VARCHAR	6							
+                    GRSS	MELANBIDE11_CONTRATACION	MELANBIDE11	Grupo de cotizaciï¿½n de la S.S. (Desplegable del 1 al 10)	VARCHAR	2	OBLIGATORIO	DESPLEGABLE GCOT					
+                    DIRCENTRCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Direcciï¿½n de centro de trabajo de destino	VARCHAR	100	OBLIGATORIO						
+                    NSSCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Nï¿½mero de cuenta de cotizaciï¿½n de la S.S.	VARCHAR	22	OBLIGATORIO						
                     CSTCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Coste contrato: salario bruto anual, pagas incluidas, excluidos los costes a la S.S.	NUMBER	8,2	OBLIGATORIO						
 
-    CONTRATACIÓN: IMPORTE DE LA SUBVENCIÓN SOLICITADA PARA EL PUESTO														
-                    IMPSUBVCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Importe de la Subvención solicitada para el puesto	NUMBER	8,2	OBLIGATORIO						
+    CONTRATACIï¿½N: IMPORTE DE LA SUBVENCIï¿½N SOLICITADA PARA EL PUESTO														
+                    IMPSUBVCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Importe de la Subvenciï¿½n solicitada para el puesto	NUMBER	8,2	OBLIGATORIO						
 
 */
 
 /*
-  Se añaden campos convocatoria 2022
-    CONTRATACIÓN: DATOS DE LA PERSONA CONTRATADA
-        CODFORCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Código de la acción formativa finalizada	VARCHAR	20	NO
-        DENFORCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Denominación de la acción formativa finalizada	VARCHAR	150	NO
+  Se aï¿½aden campos convocatoria 2022
+    CONTRATACIï¿½N: DATOS DE LA PERSONA CONTRATADA
+        CODFORCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Cï¿½digo de la acciï¿½n formativa finalizada	VARCHAR	20	NO
+        DENFORCONT	MELANBIDE11_CONTRATACION	MELANBIDE11	Denominaciï¿½n de la acciï¿½n formativa finalizada	VARCHAR	150	NO
 
-    CONTRATACIÓN: DATOS DEL PUESTO DE TRABAJO
+    CONTRATACIï¿½N: DATOS DEL PUESTO DE TRABAJO
         HORASCONV	MELANBIDE11_CONTRATACION	MELANBIDE11	Horas convenio (en caso de Jornada Parcial)	        NUMBER	4	SI
-        TIPRSB	        MELANBIDE11_CONTRATACION	MELANBIDE11	Tipo de retribución salarial bruta (coste contrato)	VARCHAR	10	NO	DESPLEGABLE DTRT 'A'(ANUAL), 'M'(MENSUAL)
+        TIPRSB	        MELANBIDE11_CONTRATACION	MELANBIDE11	Tipo de retribuciï¿½n salarial bruta (coste contrato)	VARCHAR	10	NO	DESPLEGABLE DTRT 'A'(ANUAL), 'M'(MENSUAL)
 
 */
 
 /*
-  Se añade nuevo campo DESTITULACION - Titulación solicitud
-    CONTRATACIÓN: DATOS DEL PUESTO DE TRABAJO
-        DESTITULACION	MELANBIDE11_CONTRATACION	MELANBIDE11	Titulación solicitud	VARCHAR	200	NO
+  Se aï¿½ade nuevo campo DESTITULACION - Titulaciï¿½n solicitud
+    CONTRATACIï¿½N: DATOS DEL PUESTO DE TRABAJO
+        DESTITULACION	MELANBIDE11_CONTRATACION	MELANBIDE11	Titulaciï¿½n solicitud	VARCHAR	200	NO
 */
 
 public class ContratacionVO {
@@ -89,6 +89,7 @@ public class ContratacionVO {
     private String titulacion;
     private String desTitulacionLibre;
     private String desTitulacion;
+    private String titulacionRequerida;
     private String cProfesionalidad;
     private String desCProfesionalidad;
     private String modalidadContrato;
@@ -299,6 +300,14 @@ public class ContratacionVO {
 
     public void setDesTitulacion(String desTitulacion) {
         this.desTitulacion = desTitulacion;
+    }
+
+    public String getTitulacionRequerida() {
+        return titulacionRequerida;
+    }
+
+    public void setTitulacionRequerida(String titulacionRequerida) {
+        this.titulacionRequerida = titulacionRequerida;
     }
 
     public String getcProfesionalidad() {

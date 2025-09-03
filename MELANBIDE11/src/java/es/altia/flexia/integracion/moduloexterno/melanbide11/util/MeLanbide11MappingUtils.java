@@ -93,7 +93,7 @@ public class MeLanbide11MappingUtils {
         contratacion.setPuesto(rs.getString("PUESTOCONT"));
         contratacion.setOcupacion(rs.getString("CODOCUCONT"));
         contratacion.setDesOcupacionLibre(rs.getString("OCUCONT"));
-        contratacion.setDesTitulacionLibre(rs.getString("DESTITULACION"));
+        contratacion.setTitulacionRequerida(rs.getString("DESTITULACION"));
         contratacion.setTitulacion(rs.getString("TITULACION"));
         contratacion.setcProfesionalidad(rs.getString("CPROFESIONALIDAD"));
         contratacion.setModalidadContrato(rs.getString("MODCONT"));

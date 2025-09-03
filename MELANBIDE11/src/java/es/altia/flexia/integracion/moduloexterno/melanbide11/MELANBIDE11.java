@@ -344,8 +344,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String ocupacion = (String) request.getParameter("ocupacion");
             String desOcupacion = (String) request.getParameter("desOcupacion");
             String desOcupacionLibre = (String) request.getParameter("desOcupacionLibre");
-            String desTitulacionLibre = (String) request.getParameter("desTitulacionLibre");
             String titulacion = (String) request.getParameter("titulacion");
+            String titulacionRequerida = (String) request.getParameter("titulacionRequerida");
             String cProfesionalidad = (String) request.getParameter("cProfesionalidad");
             String modalidadContrato = (String) request.getParameter("modalidadContrato");
             String jornada = (String) request.getParameter("jornada");
@@ -390,8 +390,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             nuevaContratacion.setOcupacion(ocupacion);
             nuevaContratacion.setDesOcupacion(desOcupacion);
             nuevaContratacion.setDesOcupacionLibre(desOcupacionLibre);
-            nuevaContratacion.setDesTitulacionLibre(desTitulacionLibre);
             nuevaContratacion.setTitulacion(titulacion);
+            nuevaContratacion.setTitulacionRequerida(titulacionRequerida);
             nuevaContratacion.setcProfesionalidad(cProfesionalidad);
             nuevaContratacion.setModalidadContrato(modalidadContrato);
             nuevaContratacion.setJornada(jornada);
@@ -472,8 +472,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String ocupacion = (String) request.getParameter("ocupacion");
             String desOcupacion = (String) request.getParameter("desOcupacion");
             String desOcupacionLibre = (String) request.getParameter("desOcupacionLibre");
-            String desTitulacionLibre = (String) request.getParameter("desTitulacionLibre");
             String titulacion = (String) request.getParameter("titulacion");
+            String titulacionRequerida = (String) request.getParameter("titulacionRequerida");
             String cProfesionalidad = (String) request.getParameter("cProfesionalidad");
             String modalidadContrato = (String) request.getParameter("modalidadContrato");
             String jornada = (String) request.getParameter("jornada");
@@ -530,8 +530,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 datModif.setOcupacion(ocupacion);
                 datModif.setDesOcupacion(desOcupacion);
                 datModif.setDesOcupacionLibre(desOcupacionLibre);
-                datModif.setDesTitulacionLibre(desTitulacionLibre);
                 datModif.setTitulacion(titulacion);
+                datModif.setTitulacionRequerida(titulacionRequerida);
                 datModif.setcProfesionalidad(cProfesionalidad);
                 datModif.setModalidadContrato(modalidadContrato);
                 datModif.setJornada(jornada);
@@ -675,7 +675,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                     try {
                         lista = MeLanbide11Manager.getInstance().getDatosMinimis(numExp, codOrganizacion, adapt);
                     } catch (Exception ex) {
-                        log.debug("Error al recuperar la lista de minimis después de eliminar una minimis");
+                        log.debug("Error al recuperar la lista de minimis despuï¿½s de eliminar una minimis");
                     }
                 }
             }
@@ -783,10 +783,10 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                         lista = meLanbide11Manager.getDatosMinimis(numExp, codOrganizacion, adapt);
                     } catch (BDException bde) {
                         codigoOperacion = "1";
-                        log.debug("Error de tipo BD al recuperar la lista de minimis después de modificar una minimis : " + bde.getMensaje());
+                        log.debug("Error de tipo BD al recuperar la lista de minimis despuï¿½s de modificar una minimis : " + bde.getMensaje());
                     } catch (Exception ex) {
                         codigoOperacion = "2";
-                        log.debug("Error al recuperar la lista de minimis después de modificar una minimis : " + ex.getMessage());
+                        log.debug("Error al recuperar la lista de minimis despuï¿½s de modificar una minimis : " + ex.getMessage());
                     }
                 } else {
                     codigoOperacion = "2";
