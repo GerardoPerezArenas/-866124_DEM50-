@@ -367,22 +367,35 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String fechaInicio = (String) request.getParameter("fechaInicio");
             String fechaFin = (String) request.getParameter("fechaFin");
             String mesesContrato = (String) request.getParameter("mesesContrato");
-            String grupoCotizacion = (String) request.getParameter("grupoCotizacion");
-            String direccionCT = (String) request.getParameter("direccionCT");
-            String numSS = (String) request.getParameter("numSS");
-            String costeContratoParam = (String) request.getParameter("costeContrato");
-            String costeContrato = (costeContratoParam != null) ? costeContratoParam.replace(",", ".") : null;
-            String tipRetribucion = (String) request.getParameter("tipRetribucion");
-            
-            String importeSubParam = (String) request.getParameter("importeSub");
-            String importeSub = (importeSubParam != null) ? importeSubParam.replace(",", ".") : null;
 
-            // Nuevos campos TITREQPUESTO y FUNCIONES
-            String titReqPuesto = (String) request.getParameter("titReqPuesto");
+            // --- Normalización y validación de parámetros numéricos y texto ---
+            String grupoCotizacion = request.getParameter("grupoCotizacion");
+            grupoCotizacion = (grupoCotizacion != null && !grupoCotizacion.trim().isEmpty()) ? grupoCotizacion.trim() : null;
+
+            String direccionCT = request.getParameter("direccionCT");
+            direccionCT = (direccionCT != null && !direccionCT.trim().isEmpty()) ? direccionCT.trim() : null;
+
+            String numSS = request.getParameter("numSS");
+            numSS = (numSS != null && !numSS.trim().isEmpty()) ? numSS.trim() : null;
+
+            String costeContratoParam = request.getParameter("costeContrato");
+            String costeContrato = (costeContratoParam != null && !costeContratoParam.trim().isEmpty()) ? costeContratoParam.trim().replace(",", ".") : null;
+
+            String tipRetribucion = request.getParameter("tipRetribucion");
+            tipRetribucion = (tipRetribucion != null && !tipRetribucion.trim().isEmpty()) ? tipRetribucion.trim() : null;
+
+            String importeSubParam = request.getParameter("importeSub");
+            String importeSub = (importeSubParam != null && !importeSubParam.trim().isEmpty()) ? importeSubParam.trim().replace(",", ".") : null;
+
+            // --- Nuevos campos TITREQPUESTO y FUNCIONES ---
+            String titReqPuesto = request.getParameter("titReqPuesto"); // código del combo
+            titReqPuesto = (titReqPuesto != null && !titReqPuesto.trim().isEmpty()) ? titReqPuesto.trim() : null;
+
             String funciones = request.getParameter("funciones");
-            // Validación servidor: máximo 200 caracteres (evita errores si el navegador ignora maxlength)
-            if (funciones != null && funciones.length() > 200) {
-                funciones = funciones.substring(0, 200);
+            if (funciones != null) {
+                funciones = funciones.trim();
+                if (funciones.length() > 200) funciones = funciones.substring(0, 200);
+                if (funciones.isEmpty()) funciones = null;
             }
 
             
@@ -1103,7 +1116,12 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             xmlSalida.append(fila.getModalidadContrato());
             xmlSalida.append("</MODCONT>");
             xmlSalida.append("<JORCONT>");
-            xmlSalida.append(getDescripcionDesplegable(request, fila.getDesJornada()));
+            String descJornada = getDescripcionDesplegable(request, fila.getDesJornada());
+            if (descJornada == null || descJornada.trim().isEmpty() || "-".equals(descJornada.trim())) {
+                xmlSalida.append("-");
+            } else {
+                xmlSalida.append(descJornada);
+            }
             xmlSalida.append("</JORCONT>");
             xmlSalida.append("<PORCJOR>");
             if (fila.getPorcJornada()!= null && !"".equals(fila.getPorcJornada())) {

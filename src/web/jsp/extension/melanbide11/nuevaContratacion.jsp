@@ -2078,23 +2078,7 @@
                     </div>
 
                     <br><br>
-                    <div class="lineaFormulario">
-                        <div class="etiqueta" style="width: 250px; float: left;">
-                            <%=meLanbide11I18n.getMensaje(idiomaUsuario,"label.cProfesionalidad")%>
-                        </div>
-                        <div>
-                            <div>
-                                <input type="text" name="codListaCProfesionalidad" id="codListaCProfesionalidad" size="12" class="inputTexto" value="" onkeyup="xAMayusculas(this);" />
-                                <input type="text" name="descListaCProfesionalidad"  id="descListaCProfesionalidad" size="120" class="inputTexto" readonly="true" value="" />
-                                <a href="" id="anchorListaCProfesionalidad" name="anchorListaCProfesionalidad">
-                                    <span class="fa fa-chevron-circle-down" aria-hidden="true" id="botonAplicacion"
-                                          name="botonAplicacion" style="cursor:pointer;"></span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <br><br>
+                   
                     <div class="lineaFormulario">
                         <div style="width: 250px; float: left;" class="etiqueta">
                             <%=meLanbide11I18n.getMensaje(idiomaUsuario,"label.modalidadContrato")%>
@@ -2422,17 +2406,17 @@
                 comboListaTipRetribucion.change = cargarDatosTipRetribucion;
 
                 /*desplegable titReqPuesto*/
-listaCodigosTitReqPuesto[0] = "";
-listaDescripcionesTitReqPuesto[0] = "";
-contador = 0;
-<logic:iterate id="titReqPuesto" name="listaTitReqPuesto" scope="request">
-  listaCodigosTitReqPuesto[contador]      = ['<bean:write name="titReqPuesto" property="codigo" />'];
-  listaDescripcionesTitReqPuesto[contador] = ['<bean:write name="titReqPuesto" property="descripcion" />'];
-  contador++;
-</logic:iterate>
-comboListaTitReqPuesto = new Combo("ListaTitReqPuesto");
-comboListaTitReqPuesto.addItems(listaCodigosTitReqPuesto, listaDescripcionesTitReqPuesto);
-comboListaTitReqPuesto.change = cargarDatosTitReqPuesto;
+                listaCodigosTitReqPuesto[0] = "";
+                listaDescripcionesTitReqPuesto[0] = "";
+                contador = 0;
+                <logic:iterate id="titReqPuesto" name="listaTitReqPuesto" scope="request">
+                    listaCodigosTitReqPuesto[contador] = '<bean:write name="titReqPuesto" property="codigo" />';
+                    listaDescripcionesTitReqPuesto[contador] = '<bean:write name="titReqPuesto" property="descripcion" />';
+                    contador++;
+                </logic:iterate>
+                comboListaTitReqPuesto = new Combo("ListaTitReqPuesto");
+                comboListaTitReqPuesto.addItems(listaCodigosTitReqPuesto, listaDescripcionesTitReqPuesto);
+                comboListaTitReqPuesto.change = cargarDatosTitReqPuesto;
                 var nuevo = "<%=nuevo%>";
                 if (nuevo == 0) {
                     rellenardatModificar();
