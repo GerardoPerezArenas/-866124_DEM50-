@@ -219,7 +219,7 @@ public class MeLanbide11DAO {
                     + "', '" + nuevaContratacion.getPuesto()
                     + "', '" + nuevaContratacion.getOcupacion()
                     + "', '" + nuevaContratacion.getDesOcupacionLibre()
-                    + "', '" + nuevaContratacion.getDesTitulacionLibre()
+                    + "', '" + nuevaContratacion.getTitulacionRequerida()
                     + "', '" + nuevaContratacion.getTitulacion()
                     + "', '" + nuevaContratacion.getcProfesionalidad()
                     + "', '" + nuevaContratacion.getModalidadContrato()
@@ -302,7 +302,7 @@ public class MeLanbide11DAO {
                     + ", PUESTOCONT='" + datModif.getPuesto() + "'"
                     + ", CODOCUCONT='" + datModif.getOcupacion() + "'"
                     + ", OCUCONT='" + datModif.getDesOcupacionLibre() + "'"
-                    + ", DESTITULACION='" + datModif.getDesTitulacionLibre()+ "'"
+                    + ", DESTITULACION='" + datModif.getTitulacionRequerida()+ "'"
                     + ", TITULACION='" + datModif.getTitulacion()+ "'"
                     + ", CPROFESIONALIDAD='" + datModif.getcProfesionalidad()+ "'"
                     + ", MODCONT='" + datModif.getModalidadContrato() + "'"

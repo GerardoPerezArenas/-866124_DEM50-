@@ -344,7 +344,6 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String ocupacion = (String) request.getParameter("ocupacion");
             String desOcupacion = (String) request.getParameter("desOcupacion");
             String desOcupacionLibre = (String) request.getParameter("desOcupacionLibre");
-            String desTitulacionLibre = (String) request.getParameter("desTitulacionLibre");
             String titulacion = (String) request.getParameter("titulacion");
             String titulacionRequerida = (String) request.getParameter("titulacionRequerida");
             String cProfesionalidad = (String) request.getParameter("cProfesionalidad");
@@ -391,7 +390,6 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             nuevaContratacion.setOcupacion(ocupacion);
             nuevaContratacion.setDesOcupacion(desOcupacion);
             nuevaContratacion.setDesOcupacionLibre(desOcupacionLibre);
-            nuevaContratacion.setDesTitulacionLibre(desTitulacionLibre);
             nuevaContratacion.setTitulacion(titulacion);
             nuevaContratacion.setTitulacionRequerida(titulacionRequerida);
             nuevaContratacion.setcProfesionalidad(cProfesionalidad);
@@ -474,7 +472,6 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String ocupacion = (String) request.getParameter("ocupacion");
             String desOcupacion = (String) request.getParameter("desOcupacion");
             String desOcupacionLibre = (String) request.getParameter("desOcupacionLibre");
-            String desTitulacionLibre = (String) request.getParameter("desTitulacionLibre");
             String titulacion = (String) request.getParameter("titulacion");
             String titulacionRequerida = (String) request.getParameter("titulacionRequerida");
             String cProfesionalidad = (String) request.getParameter("cProfesionalidad");
@@ -533,7 +530,6 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 datModif.setOcupacion(ocupacion);
                 datModif.setDesOcupacion(desOcupacion);
                 datModif.setDesOcupacionLibre(desOcupacionLibre);
-                datModif.setDesTitulacionLibre(desTitulacionLibre);
                 datModif.setTitulacion(titulacion);
                 datModif.setTitulacionRequerida(titulacionRequerida);
                 datModif.setcProfesionalidad(cProfesionalidad);

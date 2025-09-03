@@ -1275,7 +1275,6 @@
                                 + "&puesto=" + document.getElementById('puesto').value
                                 + "&ocupacion=" + document.getElementById('codListaOcupacion').value
                                 + "&desOcupacionLibre=" + document.getElementById('desOcupacionLibre').value
-                                + "&desTitulacionLibre=" + document.getElementById('desTitulacionLibre').value
                                 + "&titulacion=" + document.getElementById('codListaTitulacion').value
                                 + "&titulacionRequerida=" + document.getElementById('codListaTitulacionRequerida').value
                                 + "&cProfesionalidad=" + document.getElementById('codListaCProfesionalidad').value
@@ -1314,7 +1313,6 @@
                                 + "&puesto=" + document.getElementById('puesto').value
                                 + "&ocupacion=" + document.getElementById('codListaOcupacion').value
                                 + "&desOcupacionLibre=" + document.getElementById('desOcupacionLibre').value
-                                + "&desTitulacionLibre=" + document.getElementById('desTitulacionLibre').value
                                 + "&titulacion=" + document.getElementById('codListaTitulacion').value
                                 + "&titulacionRequerida=" + document.getElementById('codListaTitulacionRequerida').value
                                 + "&cProfesionalidad=" + document.getElementById('codListaCProfesionalidad').value
