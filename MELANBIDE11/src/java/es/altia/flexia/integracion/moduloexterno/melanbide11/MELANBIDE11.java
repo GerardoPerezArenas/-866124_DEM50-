@@ -951,25 +951,76 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
     // ----------------------------------------------------------------------------------------------------------
     private void retornarXML(String salida, HttpServletResponse response) {
         try {
-            if (salida != null) {
+            if (salida != null && !salida.isEmpty()) {
+                // Ensure proper response headers to avoid chunked encoding issues
                 response.setContentType("text/xml");
                 response.setCharacterEncoding("UTF-8");
+                
+                // Calculate content length in bytes to avoid chunked encoding
+                byte[] responseData = salida.getBytes("UTF-8");
+                response.setContentLength(responseData.length);
+                
+                // Prevent caching
+                response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                response.setHeader("Pragma", "no-cache");
+                response.setDateHeader("Expires", 0);
+                
                 PrintWriter out = response.getWriter();
                 out.print(salida);
                 out.flush();
                 out.close();
+            } else {
+                // Return a proper error XML response when salida is null or empty
+                String errorXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RESPUESTA><CODIGO_OPERACION>2</CODIGO_OPERACION></RESPUESTA>";
+                response.setContentType("text/xml");
+                response.setCharacterEncoding("UTF-8");
+                
+                byte[] responseData = errorXML.getBytes("UTF-8");
+                response.setContentLength(responseData.length);
+                
+                response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                response.setHeader("Pragma", "no-cache");
+                response.setDateHeader("Expires", 0);
+                
+                PrintWriter out = response.getWriter();
+                out.print(errorXML);
+                out.flush();
+                out.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error returning XML response", e);
+            try {
+                // Ensure we always return some response even on error
+                if (!response.isCommitted()) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    String errorXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RESPUESTA><CODIGO_OPERACION>2</CODIGO_OPERACION></RESPUESTA>";
+                    response.setContentType("text/xml");
+                    response.setCharacterEncoding("UTF-8");
+                    
+                    byte[] responseData = errorXML.getBytes("UTF-8");
+                    response.setContentLength(responseData.length);
+                    
+                    PrintWriter out = response.getWriter();
+                    out.print(errorXML);
+                    out.flush();
+                    out.close();
+                }
+            } catch (Exception ex) {
+                log.error("Failed to send error response", ex);
+            }
         }
     }
     
     private String obtenerXmlSalidaContratacion(HttpServletRequest request, String codigoOperacion, List<ContratacionVO> lista) {
         StringBuffer xmlSalida = new StringBuffer();
-        xmlSalida.append("<RESPUESTA>");
-        xmlSalida.append("<CODIGO_OPERACION>");
-        xmlSalida.append(codigoOperacion);
-        xmlSalida.append("</CODIGO_OPERACION>");
+        try {
+            xmlSalida.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            xmlSalida.append("<RESPUESTA>");
+            xmlSalida.append("<CODIGO_OPERACION>");
+            xmlSalida.append(codigoOperacion != null ? codigoOperacion : "2");
+            xmlSalida.append("</CODIGO_OPERACION>");
+            
+            if (lista != null) {
         for (ContratacionVO fila : lista) {
             xmlSalida.append("<FILA>");
             xmlSalida.append("<ID>");
@@ -1122,17 +1173,27 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             
             xmlSalida.append("</FILA>");
         }
+        }
         xmlSalida.append("</RESPUESTA>");
         log.debug("xml: " + xmlSalida);
         return xmlSalida.toString();
+        } catch (Exception e) {
+            log.error("Error generating XML response for contratacion", e);
+            // Return a basic error response if XML generation fails
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RESPUESTA><CODIGO_OPERACION>2</CODIGO_OPERACION></RESPUESTA>";
+        }
     }
     
     private String obtenerXmlSalidaMinimis(HttpServletRequest request, String codigoOperacion, List<MinimisVO> lista) {
         StringBuffer xmlSalida = new StringBuffer();
-        xmlSalida.append("<RESPUESTA>");
-        xmlSalida.append("<CODIGO_OPERACION>");
-        xmlSalida.append(codigoOperacion);
-        xmlSalida.append("</CODIGO_OPERACION>");
+        try {
+            xmlSalida.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            xmlSalida.append("<RESPUESTA>");
+            xmlSalida.append("<CODIGO_OPERACION>");
+            xmlSalida.append(codigoOperacion != null ? codigoOperacion : "2");
+            xmlSalida.append("</CODIGO_OPERACION>");
+            
+            if (lista != null) {
         for (MinimisVO fila : lista) {
             xmlSalida.append("<FILA>");
             xmlSalida.append("<ID>");
@@ -1166,9 +1227,15 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
           
             xmlSalida.append("</FILA>");
         }
+        }
         xmlSalida.append("</RESPUESTA>");
         log.debug("xml: " + xmlSalida);
         return xmlSalida.toString();
+        } catch (Exception e) {
+            log.error("Error generating XML response for minimis", e);
+            // Return a basic error response if XML generation fails
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RESPUESTA><CODIGO_OPERACION>2</CODIGO_OPERACION></RESPUESTA>";
+        }
     }
     
     
