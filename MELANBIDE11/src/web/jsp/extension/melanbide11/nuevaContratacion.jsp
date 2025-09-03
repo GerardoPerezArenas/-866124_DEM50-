@@ -90,14 +90,14 @@
         <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/scripts/DataTables/datatables.min.css"/>
         <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/css/extension/melanbide11/melanbide11.css"/>
         <script type="text/javascript" src="<%=request.getContextPath()%>/scripts/general.js"></script>
-        <script type="text/javascript" src="<c:url value='/scripts/listaComboBox.js'/>"></script>
+
         <script type="text/javascript" src="<c:url value='/scripts/calendario.js'/>"></script>
         <script type="text/javascript" src="<%=request.getContextPath()%>/scripts/validaciones.js"></script>
         <script type="text/javascript" src="<%=request.getContextPath()%>/scripts/popup.js"></script>
-        <script type="text/javascript" src="<%=request.getContextPath()%>/scripts/extension/meLanbide11/JavaScriptUtil.js"></script>
-        <script type="text/javascript" src="<%=request.getContextPath()%>/scripts/extension/meLanbide11/Parsers.js"></script>
-        <script type="text/javascript" src="<%=request.getContextPath()%>/scripts/extension/meLanbide11/InputMask.js"></script>
-        <script type="text/javascript" src="<%=request.getContextPath()%>/scripts/extension/meLanbide11/lanbide.js"></script>
+        <script type="text/javascript" src="<%=request.getContextPath()%>/scripts/extension/melanbide11/JavaScriptUtil.js"></script>
+        <script type="text/javascript" src="<%=request.getContextPath()%>/scripts/extension/melanbide11/Parsers.js"></script>
+        <script type="text/javascript" src="<%=request.getContextPath()%>/scripts/extension/melanbide11/InputMask.js"></script>
+        <script type="text/javascript" src="<%=request.getContextPath()%>/scripts/extension/melanbide11/lanbide.js"></script>
         <!-- listaComboBox modificado para que busque sin tener en cuenta las tildes -->
         <script type="text/javascript">
             var APP_CONTEXT_PATH = '<%=request.getContextPath()%>';
@@ -541,7 +541,13 @@
                         return false;
                     };
                 }
-                document.getElementsByClassName("contenidoPantalla")[0].appendChild(this.base);
+                var contenidoPantalla = document.getElementsByClassName("contenidoPantalla")[0];
+                if (contenidoPantalla) {
+                    contenidoPantalla.appendChild(this.base);
+                } else {
+                    // Fallback to body if contenidoPantalla doesn't exist
+                    document.body.appendChild(this.base);
+                }
                 this.addItems([], []);
             }
 
@@ -726,15 +732,18 @@
                 }
 
 
+                var contenidoPantalla = document.getElementsByClassName("contenidoPantalla")[0];
+                var offsetTop = contenidoPantalla ? contenidoPantalla.getBoundingClientRect().top : 0;
+
                 if (typeof (this.base.style.posTop) !== "undefined") //es IE 9
                 {
                     this.base.style.posLeft = pX;
-                    this.base.style.posTop = pY - document.getElementsByClassName("contenidoPantalla")[0].getBoundingClientRect().top;
+                    this.base.style.posTop = pY - offsetTop;
                     this.base.style.posHeight = this.view.style.posHeight = (alto + 2 * CB_Borde + CB_Scroll);
                     this.base.style.posWidth = this.view.style.posWidth = this.des.offsetWidth + ((this.view.scrollHeight == this.view.clientHeight) ? 0 : 16);
                 } else {
                     this.base.style.left = +pX + "px";
-                    this.base.style.top = pY - document.getElementsByClassName("contenidoPantalla")[0].getBoundingClientRect().top + "px";
+                    this.base.style.top = pY - offsetTop + "px";
                     this.base.style.height = this.view.style.height = (alto + 2 * CB_Borde + CB_Scroll) + "px";
                     this.base.style.width = this.view.style.width = this.des.offsetWidth + ((this.view.scrollHeight == this.view.clientHeight) ? 0 : 16) + "px";
 
