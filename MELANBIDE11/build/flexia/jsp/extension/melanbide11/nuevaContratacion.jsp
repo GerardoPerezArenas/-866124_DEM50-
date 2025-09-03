@@ -1,5 +1,6 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@taglib uri="/WEB-INF/tlds/c.tld" prefix="c" %>
 
 <%@page import="es.altia.flexia.integracion.moduloexterno.melanbide11.i18n.MeLanbide11I18n" %>
@@ -169,7 +170,7 @@
                 this.i_codigos = new Array();
                 this.i_items = new Array();
 
-                //Creamos la vista del combo, que ser· un DIV que incluir· la tabla con los elementos de la lista.
+                //Creamos la vista del combo, que ser√° un DIV que incluir√° la tabla con los elementos de la lista.
                 this.base = document.createElement("DIV");
                 this.base.combo = this;
                 this.base.style.position = 'absolute';
@@ -241,7 +242,7 @@
                     var rowID = 1;
 
                     if (!!navigator.userAgent.match(/Trident.*rv[ :]*11\./) || navigator.appName.indexOf("Internet Explorer") != -1) {
-                        // Se calcula la posiciÛn de item del combo que ha sido seleccionado
+                        // Se calcula la posici√≥n de item del combo que ha sido seleccionado
                         var i = padre.parentElement.sourceIndex;
                         var j = padre.sourceIndex;
                         rowID = (j - i - 1);
@@ -249,7 +250,7 @@
                     } else {
                         // Firefox u otro navegador
 
-                        /** Se obtiene el valor del item de men˙ seleccionado, para a partir de Èl, obtener la posiciÛn en el combo y seleccionar dicha fila **/
+                        /** Se obtiene el valor del item de men√∫ seleccionado, para a partir de √©l, obtener la posici√≥n en el combo y seleccionar dicha fila **/
                         var hijos = padre.childNodes;
                         var valorFilaSeleccionada = "";
                         if (hijos != null) {
@@ -266,7 +267,7 @@
                                 }
                             }
                         }
-                        // En z est· la posiciÛn de la fila seleccionada por el usuario
+                        // En z est√° la posici√≥n de la fila seleccionada por el usuario
                         rowID = z;
                     }// else       
 
@@ -556,7 +557,7 @@
                         this.selectItem(i);
                     } else {
                         if (this.des.readOnly)
-                            jsp_alerta('A', 'CÛdigo inexistente');
+                            jsp_alerta('A', 'C√≥digo inexistente');
                         this.selectItem(-1);
                         return false;
                     }
@@ -604,11 +605,11 @@
             }
 
             function quitarTildes(st) {
-                st = st.replace(new RegExp(/[‡·‚„‰Â]/g), "a");
-                st = st.replace(new RegExp(/[ËÈÍÎ]/g), "e");
-                st = st.replace(new RegExp(/[ÏÌÓÔ]/g), "i");
-                st = st.replace(new RegExp(/[ÚÛÙıˆ]/g), "o");
-                st = st.replace(new RegExp(/[˘˙˚¸]/g), "u");
+                st = st.replace(new RegExp(/[√†√°√¢√£√§√•]/g), "a");
+                st = st.replace(new RegExp(/[√®√©√™√´]/g), "e");
+                st = st.replace(new RegExp(/[√¨√≠√Æ√Ø]/g), "i");
+                st = st.replace(new RegExp(/[√≤√≥√¥√µ√∂]/g), "o");
+                st = st.replace(new RegExp(/[√π√∫√ª√º]/g), "u");
 
                 return st;
             }
@@ -640,7 +641,7 @@
                 var novoCodigos = [];
 
                 for (var i = 0; i < this.items.length; i++) {
-                    // se fuerza a que sea string (en el pantallaCatalogacion.jsp de catalogaciÛn no hizo falta)
+                    // se fuerza a que sea string (en el pantallaCatalogacion.jsp de catalogaci√≥n no hizo falta)
                     var itemTemp = this.items[i].toString().toLowerCase();
                     itemTemp = quitarTildes(itemTemp).toUpperCase();
                     //if (this.items[i].toString().toUpperCase().indexOf(this.des.introducido.toUpperCase()) >= 0) {
@@ -693,7 +694,7 @@
             }
 
 //********************************************************** //
-// Calculamos el tamaÒo y posicion que tendr· el Combo.      //
+// Calculamos el tama√±o y posicion que tendr√° el Combo.      //
 //***********************************************************//
             function CB_resize() {
 
@@ -1121,6 +1122,17 @@
                 buscaCodigoTitulacion(codTitulacionSeleccionado);
             }
 
+            var comboListaTitulacionRequerida;
+            var listaCodigosTitulacionRequerida = new Array();
+            var listaDescripcionesTitulacionRequerida = new Array();
+            function buscaCodigoTitulacionRequerida(codTitulacionRequerida) {
+                comboListaTitulacionRequerida.buscaCodigo(codTitulacionRequerida);
+            }
+            function cargarDatosTitulacionRequerida() {
+                var codTitulacionRequeridaSeleccionado = document.getElementById("codListaTitulacionRequerida").value;
+                buscaCodigoTitulacionRequerida(codTitulacionRequeridaSeleccionado);
+            }
+
             var comboListaCProfesionalidad;
             var listaCodigosCProfesionalidad = new Array();
             var listaDescripcionesCProfesionalidad = new Array();
@@ -1183,6 +1195,7 @@
                     buscaCodigoFinFormativa('<%=datModif.getFinFormativa() != null ? datModif.getFinFormativa() : ""%>');
                     buscaCodigoOcupacion('<%=datModif.getOcupacion() != null ? datModif.getOcupacion() : ""%>');
                     buscaCodigoTitulacion('<%=datModif.getTitulacion() != null ? datModif.getTitulacion() : ""%>');
+                    buscaCodigoTitulacionRequerida('<%=datModif.getTitulacionRequerida() != null ? datModif.getTitulacionRequerida() : ""%>');
                     buscaCodigoCProfesionalidad('<%=datModif.getcProfesionalidad() != null ? datModif.getcProfesionalidad() : ""%>');
                     buscaCodigoJornada('<%=datModif.getJornada() != null ? datModif.getJornada() : ""%>');
                     buscaCodigoGrupoCotizacion('<%=datModif.getGrupoCotizacion() != null ? datModif.getGrupoCotizacion() : ""%>');
@@ -1264,6 +1277,7 @@
                                 + "&desOcupacionLibre=" + document.getElementById('desOcupacionLibre').value
                                 + "&desTitulacionLibre=" + document.getElementById('desTitulacionLibre').value
                                 + "&titulacion=" + document.getElementById('codListaTitulacion').value
+                                + "&titulacionRequerida=" + document.getElementById('codListaTitulacionRequerida').value
                                 + "&cProfesionalidad=" + document.getElementById('codListaCProfesionalidad').value
                                 + "&modalidadContrato=" + document.getElementById('modalidadContrato').value
                                 + "&jornada=" + document.getElementById('codListaJornada').value
@@ -1302,6 +1316,7 @@
                                 + "&desOcupacionLibre=" + document.getElementById('desOcupacionLibre').value
                                 + "&desTitulacionLibre=" + document.getElementById('desTitulacionLibre').value
                                 + "&titulacion=" + document.getElementById('codListaTitulacion').value
+                                + "&titulacionRequerida=" + document.getElementById('codListaTitulacionRequerida').value
                                 + "&cProfesionalidad=" + document.getElementById('codListaCProfesionalidad').value
                                 + "&modalidadContrato=" + document.getElementById('modalidadContrato').value
                                 + "&jornada=" + document.getElementById('codListaJornada').value
@@ -2188,7 +2203,23 @@
                             <div>
                                 <input type="text" name="codListaTitulacion" id="codListaTitulacion" size="12" class="inputTexto" value="" onkeyup="xAMayusculas(this);" />
                                 <input type="text" name="descListaTitulacion"  id="descListaTitulacion" size="120" class="inputTexto" readonly="true" value="" />
-                                <a href="" id="anchorListaTitulacion" name="anchorListaTitulacion">
+                            <a href="" id="anchorListaTitulacion" name="anchorListaTitulacion">
+                                    <span class="fa fa-chevron-circle-down" aria-hidden="true" id="botonAplicacion"
+                                          name="botonAplicacion" style="cursor:pointer;"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lineaFormulario">
+                        <div class="etiqueta" style="width: 250px; float: left;">
+                            <%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida")%>
+                        </div>
+                        <div>
+                            <div>
+                                <input type="text" name="codListaTitulacionRequerida" id="codListaTitulacionRequerida" size="12" class="inputTexto" value="" onkeyup="xAMayusculas(this);" />
+                                <input type="text" name="descListaTitulacionRequerida"  id="descListaTitulacionRequerida" size="120" class="inputTexto" readonly="true" value="" />
+                                <a href="" id="anchorListaTitulacionRequerida" name="anchorListaTitulacionRequerida">
                                     <span class="fa fa-chevron-circle-down" aria-hidden="true" id="botonAplicacion"
                                           name="botonAplicacion" style="cursor:pointer;"></span>
                                 </a>
@@ -2487,6 +2518,23 @@
                 comboListaTitulacion = new Combo("ListaTitulacion");
                 comboListaTitulacion.addItems(listaCodigosTitulacion, listaDescripcionesTitulacion);
                 comboListaTitulacion.change = cargarDatosTitulacion;
+
+                /*desplegable titulacion requerida*/
+                listaCodigosTitulacionRequerida[0] = "";
+                listaDescripcionesTitulacionRequerida[0] = "";
+                listaCodigosTitulacionRequerida[1] = "OP1";
+                listaDescripcionesTitulacionRequerida[1] = "<%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida.op1")%>";
+                listaCodigosTitulacionRequerida[2] = "OP2";
+                listaDescripcionesTitulacionRequerida[2] = "<%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida.op2")%>";
+                listaCodigosTitulacionRequerida[3] = "OP3";
+                listaDescripcionesTitulacionRequerida[3] = "<%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida.op3")%>";
+                listaCodigosTitulacionRequerida[4] = "OP4";
+                listaDescripcionesTitulacionRequerida[4] = "<%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida.op4")%>";
+                listaCodigosTitulacionRequerida[5] = "OP5";
+                listaDescripcionesTitulacionRequerida[5] = "<%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida.op5")%>";
+                comboListaTitulacionRequerida = new Combo("ListaTitulacionRequerida", <%=idiomaUsuario%>);
+                comboListaTitulacionRequerida.addItems(listaCodigosTitulacionRequerida, listaDescripcionesTitulacionRequerida);
+                comboListaTitulacionRequerida.change = cargarDatosTitulacionRequerida;
 
                 /*desplegable certificado profesionalidad*/
                 listaCodigosCProfesionalidad[0] = "";

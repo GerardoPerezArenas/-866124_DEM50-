@@ -1122,6 +1122,17 @@
                 buscaCodigoTitulacion(codTitulacionSeleccionado);
             }
 
+            var comboListaTitulacionRequerida;
+            var listaCodigosTitulacionRequerida = new Array();
+            var listaDescripcionesTitulacionRequerida = new Array();
+            function buscaCodigoTitulacionRequerida(codTitulacionRequerida) {
+                comboListaTitulacionRequerida.buscaCodigo(codTitulacionRequerida);
+            }
+            function cargarDatosTitulacionRequerida() {
+                var codTitulacionRequeridaSeleccionado = document.getElementById("codListaTitulacionRequerida").value;
+                buscaCodigoTitulacionRequerida(codTitulacionRequeridaSeleccionado);
+            }
+
             var comboListaCProfesionalidad;
             var listaCodigosCProfesionalidad = new Array();
             var listaDescripcionesCProfesionalidad = new Array();
@@ -1184,6 +1195,7 @@
                     buscaCodigoFinFormativa('<%=datModif.getFinFormativa() != null ? datModif.getFinFormativa() : ""%>');
                     buscaCodigoOcupacion('<%=datModif.getOcupacion() != null ? datModif.getOcupacion() : ""%>');
                     buscaCodigoTitulacion('<%=datModif.getTitulacion() != null ? datModif.getTitulacion() : ""%>');
+                    buscaCodigoTitulacionRequerida('<%=datModif.getTitulacionRequerida() != null ? datModif.getTitulacionRequerida() : ""%>');
                     buscaCodigoCProfesionalidad('<%=datModif.getcProfesionalidad() != null ? datModif.getcProfesionalidad() : ""%>');
                     buscaCodigoJornada('<%=datModif.getJornada() != null ? datModif.getJornada() : ""%>');
                     buscaCodigoGrupoCotizacion('<%=datModif.getGrupoCotizacion() != null ? datModif.getGrupoCotizacion() : ""%>');
@@ -1265,6 +1277,7 @@
                                 + "&desOcupacionLibre=" + document.getElementById('desOcupacionLibre').value
                                 + "&desTitulacionLibre=" + document.getElementById('desTitulacionLibre').value
                                 + "&titulacion=" + document.getElementById('codListaTitulacion').value
+                                + "&titulacionRequerida=" + document.getElementById('codListaTitulacionRequerida').value
                                 + "&cProfesionalidad=" + document.getElementById('codListaCProfesionalidad').value
                                 + "&modalidadContrato=" + document.getElementById('modalidadContrato').value
                                 + "&jornada=" + document.getElementById('codListaJornada').value
@@ -1303,6 +1316,7 @@
                                 + "&desOcupacionLibre=" + document.getElementById('desOcupacionLibre').value
                                 + "&desTitulacionLibre=" + document.getElementById('desTitulacionLibre').value
                                 + "&titulacion=" + document.getElementById('codListaTitulacion').value
+                                + "&titulacionRequerida=" + document.getElementById('codListaTitulacionRequerida').value
                                 + "&cProfesionalidad=" + document.getElementById('codListaCProfesionalidad').value
                                 + "&modalidadContrato=" + document.getElementById('modalidadContrato').value
                                 + "&jornada=" + document.getElementById('codListaJornada').value
@@ -2199,21 +2213,17 @@
 
                     <div class="lineaFormulario">
                         <div class="etiqueta" style="width: 250px; float: left;">
-                            <bean:message key="anexoA.titulacion.requerida"/>
+                            <%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida")%>
                         </div>
                         <div>
-                            <logic:equal name="modoConsulta" value="true">
-                                <bean:write name="contratacionForm" property="titulacionRequeridaTexto"/>
-                            </logic:equal>
-                            <logic:notEqual name="modoConsulta" value="true">
-                                <html:select property="titulacionRequerida" styleClass="campo anchoXL" disabled="<%=modoConsulta%>">
-                                    <html:option value="OP1"><bean:message key="anexoA.titulacion.requerida.op1"/></html:option>
-                                    <html:option value="OP2"><bean:message key="anexoA.titulacion.requerida.op2"/></html:option>
-                                    <html:option value="OP3"><bean:message key="anexoA.titulacion.requerida.op3"/></html:option>
-                                    <html:option value="OP4"><bean:message key="anexoA.titulacion.requerida.op4"/></html:option>
-                                    <html:option value="OP5"><bean:message key="anexoA.titulacion.requerida.op5"/></html:option>
-                                </html:select>
-                            </logic:notEqual>
+                            <div>
+                                <input type="text" name="codListaTitulacionRequerida" id="codListaTitulacionRequerida" size="12" class="inputTexto" value="" onkeyup="xAMayusculas(this);" />
+                                <input type="text" name="descListaTitulacionRequerida"  id="descListaTitulacionRequerida" size="120" class="inputTexto" readonly="true" value="" />
+                                <a href="" id="anchorListaTitulacionRequerida" name="anchorListaTitulacionRequerida">
+                                    <span class="fa fa-chevron-circle-down" aria-hidden="true" id="botonAplicacion"
+                                          name="botonAplicacion" style="cursor:pointer;"></span>
+                                </a>
+                            </div>
                         </div>
                     </div>
 
@@ -2508,6 +2518,23 @@
                 comboListaTitulacion = new Combo("ListaTitulacion");
                 comboListaTitulacion.addItems(listaCodigosTitulacion, listaDescripcionesTitulacion);
                 comboListaTitulacion.change = cargarDatosTitulacion;
+
+                /*desplegable titulacion requerida*/
+                listaCodigosTitulacionRequerida[0] = "";
+                listaDescripcionesTitulacionRequerida[0] = "";
+                listaCodigosTitulacionRequerida[1] = "OP1";
+                listaDescripcionesTitulacionRequerida[1] = "<%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida.op1")%>";
+                listaCodigosTitulacionRequerida[2] = "OP2";
+                listaDescripcionesTitulacionRequerida[2] = "<%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida.op2")%>";
+                listaCodigosTitulacionRequerida[3] = "OP3";
+                listaDescripcionesTitulacionRequerida[3] = "<%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida.op3")%>";
+                listaCodigosTitulacionRequerida[4] = "OP4";
+                listaDescripcionesTitulacionRequerida[4] = "<%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida.op4")%>";
+                listaCodigosTitulacionRequerida[5] = "OP5";
+                listaDescripcionesTitulacionRequerida[5] = "<%=meLanbide11I18n.getMensaje(idiomaUsuario,"anexoA.titulacion.requerida.op5")%>";
+                comboListaTitulacionRequerida = new Combo("ListaTitulacionRequerida", <%=idiomaUsuario%>);
+                comboListaTitulacionRequerida.addItems(listaCodigosTitulacionRequerida, listaDescripcionesTitulacionRequerida);
+                comboListaTitulacionRequerida.change = cargarDatosTitulacionRequerida;
 
                 /*desplegable certificado profesionalidad*/
                 listaCodigosCProfesionalidad[0] = "";
