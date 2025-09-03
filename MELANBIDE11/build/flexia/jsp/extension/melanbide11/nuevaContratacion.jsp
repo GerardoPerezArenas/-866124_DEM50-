@@ -1,5 +1,6 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
+<%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@taglib uri="/WEB-INF/tlds/c.tld" prefix="c" %>
 
 <%@page import="es.altia.flexia.integracion.moduloexterno.melanbide11.i18n.MeLanbide11I18n" %>
@@ -169,7 +170,7 @@
                 this.i_codigos = new Array();
                 this.i_items = new Array();
 
-                //Creamos la vista del combo, que ser· un DIV que incluir· la tabla con los elementos de la lista.
+                //Creamos la vista del combo, que ser√° un DIV que incluir√° la tabla con los elementos de la lista.
                 this.base = document.createElement("DIV");
                 this.base.combo = this;
                 this.base.style.position = 'absolute';
@@ -241,7 +242,7 @@
                     var rowID = 1;
 
                     if (!!navigator.userAgent.match(/Trident.*rv[ :]*11\./) || navigator.appName.indexOf("Internet Explorer") != -1) {
-                        // Se calcula la posiciÛn de item del combo que ha sido seleccionado
+                        // Se calcula la posici√≥n de item del combo que ha sido seleccionado
                         var i = padre.parentElement.sourceIndex;
                         var j = padre.sourceIndex;
                         rowID = (j - i - 1);
@@ -249,7 +250,7 @@
                     } else {
                         // Firefox u otro navegador
 
-                        /** Se obtiene el valor del item de men˙ seleccionado, para a partir de Èl, obtener la posiciÛn en el combo y seleccionar dicha fila **/
+                        /** Se obtiene el valor del item de men√∫ seleccionado, para a partir de √©l, obtener la posici√≥n en el combo y seleccionar dicha fila **/
                         var hijos = padre.childNodes;
                         var valorFilaSeleccionada = "";
                         if (hijos != null) {
@@ -266,7 +267,7 @@
                                 }
                             }
                         }
-                        // En z est· la posiciÛn de la fila seleccionada por el usuario
+                        // En z est√° la posici√≥n de la fila seleccionada por el usuario
                         rowID = z;
                     }// else       
 
@@ -556,7 +557,7 @@
                         this.selectItem(i);
                     } else {
                         if (this.des.readOnly)
-                            jsp_alerta('A', 'CÛdigo inexistente');
+                            jsp_alerta('A', 'C√≥digo inexistente');
                         this.selectItem(-1);
                         return false;
                     }
@@ -604,11 +605,11 @@
             }
 
             function quitarTildes(st) {
-                st = st.replace(new RegExp(/[‡·‚„‰Â]/g), "a");
-                st = st.replace(new RegExp(/[ËÈÍÎ]/g), "e");
-                st = st.replace(new RegExp(/[ÏÌÓÔ]/g), "i");
-                st = st.replace(new RegExp(/[ÚÛÙıˆ]/g), "o");
-                st = st.replace(new RegExp(/[˘˙˚¸]/g), "u");
+                st = st.replace(new RegExp(/[√†√°√¢√£√§√•]/g), "a");
+                st = st.replace(new RegExp(/[√®√©√™√´]/g), "e");
+                st = st.replace(new RegExp(/[√¨√≠√Æ√Ø]/g), "i");
+                st = st.replace(new RegExp(/[√≤√≥√¥√µ√∂]/g), "o");
+                st = st.replace(new RegExp(/[√π√∫√ª√º]/g), "u");
 
                 return st;
             }
@@ -640,7 +641,7 @@
                 var novoCodigos = [];
 
                 for (var i = 0; i < this.items.length; i++) {
-                    // se fuerza a que sea string (en el pantallaCatalogacion.jsp de catalogaciÛn no hizo falta)
+                    // se fuerza a que sea string (en el pantallaCatalogacion.jsp de catalogaci√≥n no hizo falta)
                     var itemTemp = this.items[i].toString().toLowerCase();
                     itemTemp = quitarTildes(itemTemp).toUpperCase();
                     //if (this.items[i].toString().toUpperCase().indexOf(this.des.introducido.toUpperCase()) >= 0) {
@@ -693,7 +694,7 @@
             }
 
 //********************************************************** //
-// Calculamos el tamaÒo y posicion que tendr· el Combo.      //
+// Calculamos el tama√±o y posicion que tendr√° el Combo.      //
 //***********************************************************//
             function CB_resize() {
 
@@ -2188,11 +2189,27 @@
                             <div>
                                 <input type="text" name="codListaTitulacion" id="codListaTitulacion" size="12" class="inputTexto" value="" onkeyup="xAMayusculas(this);" />
                                 <input type="text" name="descListaTitulacion"  id="descListaTitulacion" size="120" class="inputTexto" readonly="true" value="" />
-                                <a href="" id="anchorListaTitulacion" name="anchorListaTitulacion">
+                            <a href="" id="anchorListaTitulacion" name="anchorListaTitulacion">
                                     <span class="fa fa-chevron-circle-down" aria-hidden="true" id="botonAplicacion"
                                           name="botonAplicacion" style="cursor:pointer;"></span>
                                 </a>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="lineaFormulario">
+                        <div class="etiqueta" style="width: 250px; float: left;">
+                            <%=meLanbide11I18n.getMensaje(idiomaUsuario,"label.titulacionRequerida")%>
+                        </div>
+                        <div>
+                            <select name="titulacionRequerida" id="titulacionRequerida" class="campo anchoXL">
+                                <option value="">-- Seleccione --</option>
+                                <option value="OP1">Sin estudios</option>
+                                <option value="OP2">Estudios primarios</option>
+                                <option value="OP3">Estudios secundarios</option>
+                                <option value="OP4">Estudios superiores</option>
+                                <option value="OP5">Otros estudios</option>
+                            </select>
                         </div>
                     </div>
 
@@ -2427,6 +2444,16 @@
                 listaCodigosSexo[0] = "";
                 listaDescripcionesSexo[0] = "";
                 contador = 0;
+                
+                // Fallback data in case Struts tags don't execute
+                if (typeof request === 'undefined' || !<%=(request.getAttribute("listaSexo") != null)%>) {
+                    listaCodigosSexo[0] = "H";
+                    listaDescripcionesSexo[0] = "Hombre";
+                    listaCodigosSexo[1] = "M";
+                    listaDescripcionesSexo[1] = "Mujer";
+                    contador = 2;
+                }
+                
                 <logic:iterate id="sexo" name="listaSexo" scope="request">
                 listaCodigosSexo[contador] = ['<bean:write name="sexo" property="des_val_cod" />'];
                 listaDescripcionesSexo[contador] = ['<bean:write name="sexo" property="des_nom" />'];
@@ -2440,6 +2467,16 @@
                 listaCodigosMayor55[0] = "";
                 listaDescripcionesMayor55[0] = "";
                 contador = 0;
+                
+                // Fallback data
+                if (typeof request === 'undefined' || !<%=(request.getAttribute("listaMayor55") != null)%>) {
+                    listaCodigosMayor55[0] = "S";
+                    listaDescripcionesMayor55[0] = "S√≠";
+                    listaCodigosMayor55[1] = "N";
+                    listaDescripcionesMayor55[1] = "No";
+                    contador = 2;
+                }
+                
                 <logic:iterate id="mayor55" name="listaMayor55" scope="request">
                 listaCodigosMayor55[contador] = ['<bean:write name="mayor55" property="des_val_cod" />'];
                 listaDescripcionesMayor55[contador] = ['<bean:write name="mayor55" property="des_nom" />'];
@@ -2453,6 +2490,16 @@
                 listaCodigosFinFormativa[0] = "";
                 listaDescripcionesFinFormativa[0] = "";
                 contador = 0;
+                
+                // Fallback data
+                if (typeof request === 'undefined' || !<%=(request.getAttribute("listaFinFormativa") != null)%>) {
+                    listaCodigosFinFormativa[0] = "S";
+                    listaDescripcionesFinFormativa[0] = "S√≠";
+                    listaCodigosFinFormativa[1] = "N";
+                    listaDescripcionesFinFormativa[1] = "No";
+                    contador = 2;
+                }
+                
                 <logic:iterate id="finFormativa" name="listaFinFormativa" scope="request">
                 listaCodigosFinFormativa[contador] = ['<bean:write name="finFormativa" property="des_val_cod" />'];
                 listaDescripcionesFinFormativa[contador] = ['<bean:write name="finFormativa" property="des_nom" />'];
@@ -2466,6 +2513,14 @@
                 listaCodigosOcupacion[0] = "";
                 listaDescripcionesOcupacion[0] = "";
                 contador = 0;
+                
+                // Fallback data
+                if (typeof request === 'undefined' || !<%=(request.getAttribute("listaOcupacion") != null)%>) {
+                    listaCodigosOcupacion[0] = "0000";
+                    listaDescripcionesOcupacion[0] = "Ocupaci√≥n gen√©rica";
+                    contador = 1;
+                }
+                
                 <logic:iterate id="ocupacion" name="listaOcupacion" scope="request">
                 listaCodigosOcupacion[contador] = ['<bean:write name="ocupacion" property="campoCodigo" />'];
                 listaDescripcionesOcupacion[contador] = ['<bean:write name="ocupacion" property="campoValor" />'];
@@ -2479,6 +2534,14 @@
                 listaCodigosTitulacion[0] = "";
                 listaDescripcionesTitulacion[0] = "";
                 contador = 0;
+                
+                // Fallback data  
+                if (typeof request === 'undefined' || !<%=(request.getAttribute("listaTitulacion") != null)%>) {
+                    listaCodigosTitulacion[0] = "0000";
+                    listaDescripcionesTitulacion[0] = "Titulaci√≥n gen√©rica";
+                    contador = 1;
+                }
+                
                 <logic:iterate id="titulacion" name="listaTitulacion" scope="request">
                 listaCodigosTitulacion[contador] = ['<bean:write name="titulacion" property="campoCodigo" />'];
                 listaDescripcionesTitulacion[contador] = ['<bean:write name="titulacion" property="campoValor" />'];
@@ -2492,6 +2555,14 @@
                 listaCodigosCProfesionalidad[0] = "";
                 listaDescripcionesCProfesionalidad[0] = "";
                 contador = 0;
+                
+                // Fallback data
+                if (typeof request === 'undefined' || !<%=(request.getAttribute("listaCProfesionalidad") != null)%>) {
+                    listaCodigosCProfesionalidad[0] = "0000";
+                    listaDescripcionesCProfesionalidad[0] = "Certificado gen√©rico";
+                    contador = 1;
+                }
+                
                 <logic:iterate id="CProfesionalidad" name="listaCProfesionalidad" scope="request">
                 listaCodigosCProfesionalidad[contador] = ['<bean:write name="CProfesionalidad" property="campoCodigo" />'];
                 listaDescripcionesCProfesionalidad[contador] = ['<bean:write name="CProfesionalidad" property="campoValor" />'];
@@ -2505,6 +2576,16 @@
                 listaCodigosJornada[0] = "";
                 listaDescripcionesJornada[0] = "";
                 contador = 0;
+                
+                // Fallback data
+                if (typeof request === 'undefined' || !<%=(request.getAttribute("listaJornada") != null)%>) {
+                    listaCodigosJornada[0] = "COMP";
+                    listaDescripcionesJornada[0] = "Completa";
+                    listaCodigosJornada[1] = "PARC";
+                    listaDescripcionesJornada[1] = "Parcial";
+                    contador = 2;
+                }
+                
                 <logic:iterate id="jornada" name="listaJornada" scope="request">
                 listaCodigosJornada[contador] = ['<bean:write name="jornada" property="des_val_cod" />'];
                 listaDescripcionesJornada[contador] = ['<bean:write name="jornada" property="des_nom" />'];
@@ -2518,6 +2599,16 @@
                 listaCodigosGrupoCotizacion[0] = "";
                 listaDescripcionesGrupoCotizacion[0] = "";
                 contador = 0;
+                
+                // Fallback data
+                if (typeof request === 'undefined' || !<%=(request.getAttribute("listaGrupoCotizacion") != null)%>) {
+                    listaCodigosGrupoCotizacion[0] = "01";
+                    listaDescripcionesGrupoCotizacion[0] = "Grupo 1";
+                    listaCodigosGrupoCotizacion[1] = "02";
+                    listaDescripcionesGrupoCotizacion[1] = "Grupo 2";
+                    contador = 2;
+                }
+                
                 <logic:iterate id="grupoCotizacion" name="listaGrupoCotizacion" scope="request">
                 listaCodigosGrupoCotizacion[contador] = ['<bean:write name="grupoCotizacion" property="des_val_cod" />'];
                 listaDescripcionesGrupoCotizacion[contador] = ['<bean:write name="grupoCotizacion" property="des_nom" />'];
@@ -2531,6 +2622,16 @@
                 listaCodigosTipRetribucion[0] = "";
                 listaDescripcionesTipRetribucion[0] = "";
                 contador = 0;
+                
+                // Fallback data
+                if (typeof request === 'undefined' || !<%=(request.getAttribute("listaTipRetribucion") != null)%>) {
+                    listaCodigosTipRetribucion[0] = "FIJO";
+                    listaDescripcionesTipRetribucion[0] = "Salario fijo";
+                    listaCodigosTipRetribucion[1] = "VARI";
+                    listaDescripcionesTipRetribucion[1] = "Salario variable";
+                    contador = 2;
+                }
+                
                 <logic:iterate id="tipRetribucion" name="listaTipRetribucion" scope="request">
                 listaCodigosTipRetribucion[contador] = ['<bean:write name="tipRetribucion" property="des_val_cod" />'];
                 listaDescripcionesTipRetribucion[contador] = ['<bean:write name="tipRetribucion" property="des_nom" />'];
