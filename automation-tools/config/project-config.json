@@ -1,0 +1,40 @@
+{
+  "project": {
+    "name": "MELANBIDE11",
+    "base_package": "es.altia.flexia.integracion.moduloexterno.melanbide11",
+    "web_context": "/melanbide11"
+  },
+  "paths": {
+    "java_src": "MELANBIDE11/src/java",
+    "web_src": "MELANBIDE11/src/web",
+    "jsp_path": "MELANBIDE11/src/web/jsp/extension/melanbide11",
+    "js_path": "MELANBIDE11/src/web/scripts/extension/melanbide11",
+    "css_path": "MELANBIDE11/src/web/css/extension/melanbide11"
+  },
+  "patterns": {
+    "vo_suffix": "VO",
+    "manager_suffix": "Manager", 
+    "dao_suffix": "DAO",
+    "jsp_prefix": "",
+    "js_prefix": ""
+  },
+  "database": {
+    "table_prefix": "MELANBIDE11_",
+    "column_types": {
+      "VARCHAR": "String",
+      "NUMBER": "Double",
+      "INTEGER": "Integer", 
+      "DATE": "Date",
+      "BOOLEAN": "Boolean"
+    }
+  },
+  "ui_components": {
+    "table_class": "FixedColumnTable",
+    "dropdown_pattern": "DESPLEGABLE",
+    "tab_container": "tab-page"
+  },
+  "i18n": {
+    "class": "MeLanbide11I18n",
+    "method": "getMensaje"
+  }
+}
