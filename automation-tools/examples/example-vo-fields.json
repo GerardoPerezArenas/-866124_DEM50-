@@ -1,0 +1,32 @@
+[
+    {
+        "name": "codigo",
+        "type": "VARCHAR(20)",
+        "description": "Código único del documento"
+    },
+    {
+        "name": "titulo",
+        "type": "VARCHAR(255)",
+        "description": "Título del documento"
+    },
+    {
+        "name": "descripcion",
+        "type": "VARCHAR(500)",
+        "description": "Descripción detallada"
+    },
+    {
+        "name": "fechaCreacion",
+        "type": "DATE",
+        "description": "Fecha de creación"
+    },
+    {
+        "name": "activo",
+        "type": "VARCHAR(1)",
+        "description": "Indica si está activo (S/N)"
+    },
+    {
+        "name": "tamaño",
+        "type": "NUMBER(10,2)",
+        "description": "Tamaño en MB"
+    }
+]
