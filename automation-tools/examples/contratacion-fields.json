@@ -1,0 +1,32 @@
+[
+    {
+        "name": "codigo",
+        "type": "VARCHAR(20)",
+        "description": "Código único de la contratación"
+    },
+    {
+        "name": "tipoContrato",
+        "type": "VARCHAR(50)",
+        "description": "Tipo de contrato"
+    },
+    {
+        "name": "fechaInicio",
+        "type": "DATE",
+        "description": "Fecha de inicio del contrato"
+    },
+    {
+        "name": "fechaFin",
+        "type": "DATE",
+        "description": "Fecha de finalización del contrato"
+    },
+    {
+        "name": "salario",
+        "type": "NUMBER(10,2)",
+        "description": "Salario mensual"
+    },
+    {
+        "name": "activo",
+        "type": "VARCHAR(1)",
+        "description": "Indica si está activo (S/N)"
+    }
+]
