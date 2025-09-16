@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Multi Time Zone Digital Clock</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #222; color: #fff; }
+    .clock-container { display: flex; flex-wrap: wrap; gap: 2rem; margin: 2rem; }
+    .clock {
+      background: #333;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      text-align: center;
+      min-width: 200px;
+      box-shadow: 0 0 10px #0003;
+    }
+    .tz-name { font-size: 1.2em; margin-bottom: 0.5em; color: #ffd700; }
+    .time { font-size: 2em; letter-spacing: 2px; }
+  </style>
+</head>
+<body>
+  <h1>Digital Clock - Multiple Time Zones</h1>
+  <div class="clock-container" id="clocks"></div>
+
+  <script>
+    // List of time zones to display
+    const timeZones = [
+      { name: "CDMX (America/Mexico_City)", tz: "America/Mexico_City" },
+      { name: "UTC", tz: "UTC" },
+      { name: "New York (America/New_York)", tz: "America/New_York" },
+      { name: "London (Europe/London)", tz: "Europe/London" },
+      { name: "Tokyo (Asia/Tokyo)", tz: "Asia/Tokyo" }
+    ];
+
+    // Create clock elements
+    const clocksDiv = document.getElementById('clocks');
+    timeZones.forEach(tz => {
+      const clock = document.createElement('div');
+      clock.className = 'clock';
+      clock.innerHTML = `<div class="tz-name">${tz.name}</div>
+                         <div class="time" id="time-${tz.tz.replace(/\//g, '-')}" >--:--:--</div>`;
+      clocksDiv.appendChild(clock);
+    });
+
+    function updateClocks() {
+      timeZones.forEach(tz => {
+        const now = new Date();
+        // Format time in the given time zone
+        const timeString = now.toLocaleTimeString('en-US', {
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hour12: false, timeZone: tz.tz
+        });
+        document.getElementById(`time-${tz.tz.replace(/\//g, '-')}`).textContent = timeString;
+      });
+    }
+
+    updateClocks();
+    setInterval(updateClocks, 1000);
+  </script>
+</body>
+</html>
