@@ -138,14 +138,20 @@
     tablaDesgloseTipo1.addColumna('100', 'right', '<%= i18nM11Tab2.getMensaje(idiomaUsuarioTab2, "tab2.desglose.col.importe") %>');
     tablaDesgloseTipo1.addColumna('120', 'left',  '<%= i18nM11Tab2.getMensaje(idiomaUsuarioTab2, "tab2.desglose.col.concepto") %>');
     tablaDesgloseTipo1.addColumna('380', 'left', '<%= i18nM11Tab2.getMensaje(idiomaUsuarioTab2, "tab2.desglose.col.observ") %>');
-    tablaDesgloseTipo1.displayCabecera = true; tablaDesgloseTipo1.height = 200; tablaDesgloseTipo1.altoCabecera = 30;
+    tablaDesgloseTipo1.displayCabecera = true; 
+    tablaDesgloseTipo1.height = 200; 
+    tablaDesgloseTipo1.altoCabecera = 30;
+    tablaDesgloseTipo1.scrollY = true; // Habilitar scroll vertical explícitamente
     tablaDesgloseTipo1.dblClkFunction = 'dblClckTablaDesgloseTipo1';
 
     tablaDesgloseTipo2 = new FixedColumnTable(document.getElementById('tablaDesgloseRSB2'), anchoInicial, anchoInicial, 'tablaDesgloseRSB2');
     tablaDesgloseTipo2.addColumna('100', 'right', '<%= i18nM11Tab2.getMensaje(idiomaUsuarioTab2, "tab2.desglose.col.importe") %>');
     tablaDesgloseTipo2.addColumna('120', 'left',  '<%= i18nM11Tab2.getMensaje(idiomaUsuarioTab2, "tab2.desglose.col.concepto") %>');
     tablaDesgloseTipo2.addColumna('380', 'left', '<%= i18nM11Tab2.getMensaje(idiomaUsuarioTab2, "tab2.desglose.col.observ") %>');
-    tablaDesgloseTipo2.displayCabecera = true; tablaDesgloseTipo2.height = 200; tablaDesgloseTipo2.altoCabecera = 30;
+    tablaDesgloseTipo2.displayCabecera = true; 
+    tablaDesgloseTipo2.height = 200; 
+    tablaDesgloseTipo2.altoCabecera = 30;
+    tablaDesgloseTipo2.scrollY = true; // Habilitar scroll vertical explícitamente
     tablaDesgloseTipo2.dblClkFunction = 'dblClckTablaDesgloseTipo2';
   }
 	function recalcularAnchoTabla(){
@@ -257,6 +263,20 @@
 		if (!tablaDesgloseTipo1 || !tablaDesgloseTipo2) { crearTablasDesglose(); }
 		if (tablaDesgloseTipo1) { tablaDesgloseTipo1.lineas = listaLineasTipo1; tablaDesgloseTipo1.displayTabla(); tablaDesgloseTipo1.pack(); }
 		if (tablaDesgloseTipo2) { tablaDesgloseTipo2.lineas = listaLineasTipo2; tablaDesgloseTipo2.displayTabla(); tablaDesgloseTipo2.pack(); }
+		
+		// Asegurar que los scrolls verticales permanezcan visibles cuando sea necesario
+		setTimeout(function() {
+			var modalDesglose = document.querySelector('.m11-desglose-wrapper');
+			if (modalDesglose) {
+				// Buscar y mantener visibles los scrolls verticales (vScroll)
+				var vScrolls = modalDesglose.querySelectorAll('[id*="vScroll_"]');
+				for (var i = 0; i < vScrolls.length; i++) {
+					vScrolls[i].style.display = ''; // Mantener visible
+					vScrolls[i].style.visibility = '';
+					vScrolls[i].style.overflowY = 'auto';
+				}
+			}
+		}, 150);
 		
 		// Llamadas adicionales para eliminar scrolls horizontales
 		setTimeout(recalcularAnchoTabla, 100);
@@ -505,7 +525,7 @@
 		if (typeof guardarLineasDesglose === 'function') {
 			guardarLineasDesglose(function(resultado) {
 				console.log('Guardado completado en Tab2:', resultado);
-				if (resultado && resultado.success) {
+				if (resultado === true) {
 					console.log('Datos guardados correctamente, cerrando ventana');
 					window.close();
 				} else {

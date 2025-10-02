@@ -81,7 +81,7 @@ private static String escJS(Object v){
                 + '&tipo=0&numExp=' + encodeURIComponent(numExp)
                 + '&id=' + encodeURIComponent(idLinea);
 
-        lanzarPopUpModal(url, 920, 1200, 'no', 'no', function(result){
+        lanzarPopUpModal(url, 920, 2000, 'no', 'no', function(result){
             if (result != undefined) {
                 if (result[0] == '0') {
                     console.log("Desglose RSB completado exitosamente");

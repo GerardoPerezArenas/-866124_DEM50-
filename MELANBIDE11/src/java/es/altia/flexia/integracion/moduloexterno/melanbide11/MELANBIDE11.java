@@ -10,7 +10,9 @@ import es.altia.flexia.integracion.moduloexterno.melanbide11.manager.MeLanbide11
 import es.altia.flexia.integracion.moduloexterno.melanbide11.dao.MeLanbide11DAO.ComplementosPorTipo;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.util.ConfigurationParameter;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.util.ConstantesMeLanbide11;
+import es.altia.flexia.integracion.moduloexterno.melanbide11.util.DesgloseRSBParser;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.ContratacionVO;
+import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRSBVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.MinimisVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DatosTablaDesplegableExtVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesplegableAdmonLocalVO;
@@ -435,8 +437,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         retornarXML(xmlSalida, response);
     }
 
-    public void crearNuevaContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
-            HttpServletRequest request, HttpServletResponse response) {
+    public void crearNuevaContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
         String codigoOperacion = "0";
         List<ContratacionVO> lista = new ArrayList<ContratacionVO>();
         ContratacionVO nuevaContratacion = new ContratacionVO();
@@ -470,50 +471,18 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String cProfesionalidad = (String) request.getParameter("cProfesionalidad");
             String modalidadContrato = (String) request.getParameter("modalidadContrato");
             String jornada = (String) request.getParameter("jornada");
-            String porcJornadaParam = (String) request.getParameter("porcJornada");
-            String porcJornada = (porcJornadaParam != null) ? porcJornadaParam.replace(",", ".") : null;
+            String porcJornada = (String) request.getParameter("porcJornada").replace(",", ".");
             String horasConv = (String) request.getParameter("horasConv");
             String fechaInicio = (String) request.getParameter("fechaInicio");
             String fechaFin = (String) request.getParameter("fechaFin");
             String mesesContrato = (String) request.getParameter("mesesContrato");
-
-            // --- Normalización y validación de parámetros numéricos y texto ---
-            String grupoCotizacion = request.getParameter("grupoCotizacion");
-            grupoCotizacion = (grupoCotizacion != null && !grupoCotizacion.trim().isEmpty()) ? grupoCotizacion.trim()
-                    : null;
-
-            String direccionCT = request.getParameter("direccionCT");
-            direccionCT = (direccionCT != null && !direccionCT.trim().isEmpty()) ? direccionCT.trim() : null;
-
-            String numSS = request.getParameter("numSS");
-            numSS = (numSS != null && !numSS.trim().isEmpty()) ? numSS.trim() : null;
-
-            String costeContratoParam = request.getParameter("costeContrato");
-            String costeContrato = (costeContratoParam != null && !costeContratoParam.trim().isEmpty())
-                    ? costeContratoParam.trim().replace(",", ".")
-                    : null;
-
-            String tipRetribucion = request.getParameter("tipRetribucion");
-            tipRetribucion = (tipRetribucion != null && !tipRetribucion.trim().isEmpty()) ? tipRetribucion.trim()
-                    : null;
-
-            String importeSubParam = request.getParameter("importeSub");
-            String importeSub = (importeSubParam != null && !importeSubParam.trim().isEmpty())
-                    ? importeSubParam.trim().replace(",", ".")
-                    : null;
-
-            // --- Nuevos campos TITREQPUESTO y FUNCIONES ---
-            String titReqPuesto = request.getParameter("titReqPuesto"); // código del combo
-            titReqPuesto = (titReqPuesto != null && !titReqPuesto.trim().isEmpty()) ? titReqPuesto.trim() : null;
-
-            String funciones = request.getParameter("funciones");
-            if (funciones != null) {
-                funciones = funciones.trim();
-                if (funciones.length() > 200)
-                    funciones = funciones.substring(0, 200);
-                if (funciones.isEmpty())
-                    funciones = null;
-            }
+            String grupoCotizacion = (String) request.getParameter("grupoCotizacion");
+            String direccionCT = (String) request.getParameter("direccionCT");
+            String numSS = (String) request.getParameter("numSS");
+            String costeContrato = (String) request.getParameter("costeContrato").replace(",", ".");
+            String tipRetribucion = (String) request.getParameter("tipRetribucion");
+            
+            String importeSub = (String) request.getParameter("importeSub").replace(",", ".");
 
             SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -548,8 +517,6 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             nuevaContratacion.setcProfesionalidad(cProfesionalidad);
             nuevaContratacion.setModalidadContrato(modalidadContrato);
             nuevaContratacion.setJornada(jornada);
-            nuevaContratacion.setTitReqPuesto(titReqPuesto);
-            nuevaContratacion.setFunciones(funciones);
             if (porcJornada != null && !"".equals(porcJornada)) {
                 nuevaContratacion.setPorcJornada(Double.parseDouble(porcJornada));
             }
@@ -574,6 +541,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             if (importeSub != null && !"".equals(importeSub)) {
                 nuevaContratacion.setImporteSub(Double.parseDouble(importeSub));
             }
+            
 
             MeLanbide11Manager meLanbide11Manager = MeLanbide11Manager.getInstance();
             boolean insertOK = meLanbide11Manager.crearNuevaContratacion(nuevaContratacion, adapt);
@@ -595,8 +563,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         retornarXML(xmlSalida, response);
     }
 
-    public void modificarContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
-            HttpServletRequest request, HttpServletResponse response) {
+    public void modificarContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
         String codigoOperacion = "0";
         List<ContratacionVO> lista = new ArrayList<ContratacionVO>();
 
@@ -632,30 +599,20 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String cProfesionalidad = (String) request.getParameter("cProfesionalidad");
             String modalidadContrato = (String) request.getParameter("modalidadContrato");
             String jornada = (String) request.getParameter("jornada");
-            String porcJornadaParam = (String) request.getParameter("porcJornada");
-            String porcJornada = (porcJornadaParam != null) ? porcJornadaParam.replace(",", ".") : null;
+            String porcJornada = (String) request.getParameter("porcJornada").replace(",", ".");
             String horasConv = (String) request.getParameter("horasConv");
             String fechaInicio = (String) request.getParameter("fechaInicio");
-            // log.debug("++++++++fechaInicio: " + fechaInicio);
+            //log.debug("++++++++fechaInicio: " + fechaInicio);
             String fechaFin = (String) request.getParameter("fechaFin");
-            // log.debug("++++++++fechaFin: " + fechaFin);
+            //log.debug("++++++++fechaFin: " + fechaFin);
             String mesesContrato = (String) request.getParameter("mesesContrato");
             String grupoCotizacion = (String) request.getParameter("grupoCotizacion");
             String direccionCT = (String) request.getParameter("direccionCT");
             String numSS = (String) request.getParameter("numSS");
-            String costeContratoParam = (String) request.getParameter("costeContrato");
-            String costeContrato = (costeContratoParam != null) ? costeContratoParam.replace(",", ".") : null;
+            String costeContrato = (String) request.getParameter("costeContrato").replace(",", ".");
             String tipRetribucion = (String) request.getParameter("tipRetribucion");
 
-            String importeSubParam = (String) request.getParameter("importeSub");
-            String importeSub = (importeSubParam != null) ? importeSubParam.replace(",", ".") : null;
-
-            // Nuevos campos TITREQPUESTO y FUNCIONES (modificar)
-            String titReqPuesto = (String) request.getParameter("titReqPuesto");
-            String funciones = request.getParameter("funciones");
-            if (funciones != null && funciones.length() > 200) {
-                funciones = funciones.substring(0, 200);
-            }
+            String importeSub = (String) request.getParameter("importeSub").replace(",", ".");
 
             if (id == null || id.equals("")) {
                 log.debug("No se ha recibido desde la JSP el id de la contrataciï¿½n a modificar ");
@@ -666,6 +623,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 datModif.setId(Integer.parseInt(id));
 
                 SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+                
 
                 datModif.setNumExp(numExp);
 
@@ -699,8 +657,6 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 datModif.setcProfesionalidad(cProfesionalidad);
                 datModif.setModalidadContrato(modalidadContrato);
                 datModif.setJornada(jornada);
-                datModif.setTitReqPuesto(titReqPuesto);
-                datModif.setFunciones(funciones);
                 datModif.setPorcJornada(null);
                 if (porcJornada != null && !"".equals(porcJornada)) {
                     datModif.setPorcJornada(Double.parseDouble(porcJornada));
@@ -730,6 +686,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 if (importeSub != null && !"".equals(importeSub)) {
                     datModif.setImporteSub(Double.parseDouble(importeSub));
                 }
+            
 
                 MeLanbide11Manager meLanbide11Manager = MeLanbide11Manager.getInstance();
                 boolean modOK = meLanbide11Manager.modificarContratacion(datModif, adapt);
@@ -1460,6 +1417,215 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             log.error("Error en cargarDesgloseRSB", e);
         }
         return "/jsp/extension/melanbide11/desglose/m11Desglose.jsp";
+    }
+
+    /**
+     * Método AJAX para guardar líneas de desglose RSB. Recibe las líneas como
+     * parámetro "lineas" con formato de filas separado con ';;' y columnas con '|'
+     * => tipo|importe|concepto|observ Ej: 1|1234.56|F|Observación línea
+     * 1;;2|100|V|Obs 2. Devuelve JSON:
+     * {"resultado":{"codigoOperacion":X,"salariales":n,"extrasalariales":m,"totalComputable":t}}
+     */
+    public String guardarLineasDesgloseRSB(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+        String numExp = request.getParameter("numExp");
+        if (numExp == null || numExp.trim().isEmpty()) {
+            numExp = numExpediente; // fallback
+        }
+        String dni = request.getParameter("dni");
+        String raw = request.getParameter("lineas");
+
+        int codigoOperacion = 0; // 0 OK,1 BD,2 Sin filas (todo borrado ok),3 Parámetros,4 Genérico
+        double salariales = 0d;
+        double extrasalariales = 0d;
+        double totalComputable = 0d; // RSBCOMPCONV derivado (no lo recalculamos aquí salvo sumar)
+
+        AdaptadorSQLBD adapt = null;
+        try {
+            adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+        } catch (Exception e) {
+            log.error("[guardarLineasDesgloseRSB] Error obteniendo adaptador", e);
+        }
+
+        if (adapt == null || numExp == null || dni == null || dni.trim().isEmpty()) {
+            codigoOperacion = 3; // parámetros/adaptador
+        } else {
+            try {
+                List<DesgloseRSBVO> lista = parseLineasDesglose(raw);
+                boolean ok = MeLanbide11Manager.getInstance().reemplazarDesgloseRSB(numExp, dni, lista, adapt);
+                if (!ok) {
+                    codigoOperacion = 2; // no se insertó nada (pudo ser solo borrado o fallo silencioso)
+                }
+                // Recuperar sumas por tipo para devolver
+                try {
+                    ComplementosPorTipo comp = MeLanbide11Manager.getInstance().getSumaComplementosPorTipo(numExp, dni,
+                            adapt);
+                    if (comp != null) {
+                        salariales = comp.getSalariales();
+                        extrasalariales = comp.getExtrasalariales();
+                    }
+                    totalComputable = salariales; // se sumará con salario base y pagas en otra llamada si aplica
+                } catch (Exception sumEx) {
+                    log.warn("[guardarLineasDesgloseRSB] No se pudieron recuperar sumas por tipo", sumEx);
+                }
+            } catch (Exception e) {
+                log.error("[guardarLineasDesgloseRSB] Error BD reemplazando líneas", e);
+                codigoOperacion = 1; // BD
+            }
+        }
+
+        try {
+            response.setContentType("application/json; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
+            String json = new StringBuilder().append("{\"resultado\":{\"codigoOperacion\":").append(codigoOperacion)
+                    .append(",\"salariales\":").append(salariales).append(",\"extrasalariales\":")
+                    .append(extrasalariales).append(",\"totalComputable\":").append(totalComputable).append("}}")
+                    .toString();
+            PrintWriter out = response.getWriter();
+            out.print(json);
+            out.flush();
+            return null;
+        } catch (Exception ex) {
+            log.error("[guardarLineasDesgloseRSB] Error enviando JSON", ex);
+        }
+        return null;
+    }
+
+    private List<DesgloseRSBVO> parseLineasDesglose(String raw) {
+        // Delegamos en la utilidad para permitir pruebas unitarias independientes.
+        return es.altia.flexia.integracion.moduloexterno.melanbide11.util.DesgloseRSBParser.parse(raw);
+    }
+
+    /**
+     * Método AJAX para obtener las líneas de desglose RSB en formato JSON.
+     * Respuesta JSON: {"dni":"...",
+     * "lineas":[{"tipo":"1","importe":123.45,"concepto":"X","observ":"Y"},...]}
+     */
+    public String listarLineasDesgloseRSB(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+        AdaptadorSQLBD adapt = null;
+        List<DesgloseRSBVO> lista = new ArrayList<DesgloseRSBVO>();
+        String numExp = request.getParameter("numExp");
+        if (numExp == null || numExp.trim().isEmpty()) {
+            numExp = numExpediente; // fallback
+        }
+        // Parámetro id de la contratación seleccionada (opcional)
+        String idSeleccion = request.getParameter("id");
+        String dniSeleccion = null; // Se resolverá si llega id
+        try {
+            adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+            if (adapt != null && numExp != null && numExp.trim().length() > 0) {
+                boolean usarFiltro = (idSeleccion != null && idSeleccion.trim().length() > 0);
+                if (usarFiltro) {
+                    try {
+                        // Optimización: resolver sólo el DNI de la contratación sin cargar toda la
+                        // lista
+                        java.sql.Connection con = null;
+                        try {
+                            con = adapt.getConnection();
+                            dniSeleccion = es.altia.flexia.integracion.moduloexterno.melanbide11.dao.MeLanbide11DAO
+                                    .getInstance().getDniContratacionById(numExp, idSeleccion, con);
+                        } finally {
+                            try {
+                                if (con != null)
+                                    adapt.devolverConexion(con);
+                            } catch (Exception ignore) {
+                            }
+                        }
+                        if (dniSeleccion != null && dniSeleccion.trim().length() > 0) {
+                            lista = MeLanbide11Manager.getInstance().getDatosDesgloseRSBPorDni(numExp, dniSeleccion,
+                                    codOrganizacion, adapt);
+                            if (log.isDebugEnabled()) {
+                                // Debug optimizado
+                            }
+                        } else {
+                            lista = MeLanbide11Manager.getInstance().getDatosDesgloseRSB(numExp, codOrganizacion,
+                                    adapt);
+                            if (log.isDebugEnabled()) {
+                                // Debug sin DNI asociado
+                            }
+                        }
+                    } catch (Exception exId) {
+                        log.warn("[listarLineasDesgloseRSB] Error optimizado resolviendo DNI por ID=" + idSeleccion
+                                + ": " + exId.getMessage(), exId);
+                        lista = MeLanbide11Manager.getInstance().getDatosDesgloseRSB(numExp, codOrganizacion, adapt);
+                    }
+                } else {
+                    lista = MeLanbide11Manager.getInstance().getDatosDesgloseRSB(numExp, codOrganizacion, adapt);
+                }
+            }
+        } catch (Exception e) {
+            log.error("[listarLineasDesgloseRSB] Error recuperando datos", e);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\"dni\":\"").append(escapeJson(dniSeleccion != null ? dniSeleccion : "")).append("\",\"lineas\":[");
+        for (int i = 0; i < lista.size(); i++) {
+            DesgloseRSBVO vo = lista.get(i);
+            if (i > 0)
+                sb.append(',');
+            sb.append('{');
+            sb.append("\"tipo\":\"").append(escapeJson(nvlStr(vo.getRsbTipo()))).append("\",");
+            Double imp = vo.getRsbImporte();
+            sb.append("\"importe\":").append(imp == null ? 0 : imp.doubleValue()).append(',');
+            sb.append("\"concepto\":\"").append(escapeJson(nvlStr(vo.getRsbConcepto()))).append("\",");
+            sb.append("\"observ\":\"").append(escapeJson(nvlStr(vo.getRsbObserv()))).append("\"}");
+        }
+        sb.append("]}");
+
+        try {
+            response.setContentType("application/json; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
+            PrintWriter out = response.getWriter();
+            out.print(sb.toString());
+            out.flush();
+        } catch (Exception ioe) {
+            log.error("[listarLineasDesgloseRSB] Error enviando respuesta", ioe);
+        }
+        return null; // respuesta directa
+    }
+
+    private static String nvlStr(String v) {
+        return v == null ? "" : v;
+    }
+
+    private static String escapeJson(String s) {
+        if (s == null)
+            return "";
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+            case '"':
+                out.append("\\\"");
+                break;
+            case '\\':
+                out.append("\\\\");
+                break;
+            case '\n':
+                out.append("\\n");
+                break;
+            case '\r':
+                out.append("\\r");
+                break;
+            case '\t':
+                out.append("\\t");
+                break;
+            default:
+                if (c < 32) {
+                    out.append(String.format("\\u%04x", (int) c));
+                } else {
+                    out.append(c);
+                }
+            }
+        }
+        return out.toString();
     }
 
 }
