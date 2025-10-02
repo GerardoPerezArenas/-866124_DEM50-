@@ -1634,15 +1634,45 @@
             }
 
             function cerrarVentana() {
-                if (navigator.appName == "Microsoft Internet Explorer") {
-                    window.parent.window.opener = null;
-                    window.parent.window.close();
-                } else if (navigator.appName == "Netscape") {
-                    top.window.opener = top;
-                    top.window.open('', '_parent', '');
-                    top.window.close();
-                } else {
+                // Intentar múltiples métodos para cerrar la ventana modal
+                try {
+                    // Método 1: Cerrar ventana actual si fue abierta por window.open
+                    if (window.opener) {
+                        window.close();
+                        return;
+                    }
+                    
+                    // Método 2: Cerrar ventana padre si existe
+                    if (window.parent && window.parent !== window) {
+                        window.parent.close();
+                        return;
+                    }
+                    
+                    // Método 3: Cerrar top window
+                    if (window.top && window.top !== window) {
+                        window.top.close();
+                        return;
+                    }
+                    
+                    // Método 4: Usar self
+                    if (self && self.close) {
+                        self.close();
+                        return;
+                    }
+                    
+                    // Método 5: Cerrar ventana actual como último recurso
                     window.close();
+                } catch (e) {
+                    console.error('Error al cerrar ventana:', e);
+                    // Si todo falla, intentar redireccionar o recargar página padre
+                    try {
+                        if (window.opener) {
+                            window.opener.location.reload();
+                        }
+                        window.close();
+                    } catch (e2) {
+                        console.error('Error en fallback de cierre:', e2);
+                    }
                 }
             }
 

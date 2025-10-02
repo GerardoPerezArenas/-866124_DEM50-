@@ -437,7 +437,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         retornarXML(xmlSalida, response);
     }
 
-    public void crearNuevaContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+    public void crearNuevaContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
         String codigoOperacion = "0";
         List<ContratacionVO> lista = new ArrayList<ContratacionVO>();
         ContratacionVO nuevaContratacion = new ContratacionVO();
@@ -471,18 +472,50 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String cProfesionalidad = (String) request.getParameter("cProfesionalidad");
             String modalidadContrato = (String) request.getParameter("modalidadContrato");
             String jornada = (String) request.getParameter("jornada");
-            String porcJornada = (String) request.getParameter("porcJornada").replace(",", ".");
+            String porcJornadaParam = (String) request.getParameter("porcJornada");
+            String porcJornada = (porcJornadaParam != null) ? porcJornadaParam.replace(",", ".") : null;
             String horasConv = (String) request.getParameter("horasConv");
             String fechaInicio = (String) request.getParameter("fechaInicio");
             String fechaFin = (String) request.getParameter("fechaFin");
             String mesesContrato = (String) request.getParameter("mesesContrato");
-            String grupoCotizacion = (String) request.getParameter("grupoCotizacion");
-            String direccionCT = (String) request.getParameter("direccionCT");
-            String numSS = (String) request.getParameter("numSS");
-            String costeContrato = (String) request.getParameter("costeContrato").replace(",", ".");
-            String tipRetribucion = (String) request.getParameter("tipRetribucion");
-            
-            String importeSub = (String) request.getParameter("importeSub").replace(",", ".");
+
+            // --- Normalización y validación de parámetros numéricos y texto ---
+            String grupoCotizacion = request.getParameter("grupoCotizacion");
+            grupoCotizacion = (grupoCotizacion != null && !grupoCotizacion.trim().isEmpty()) ? grupoCotizacion.trim()
+                    : null;
+
+            String direccionCT = request.getParameter("direccionCT");
+            direccionCT = (direccionCT != null && !direccionCT.trim().isEmpty()) ? direccionCT.trim() : null;
+
+            String numSS = request.getParameter("numSS");
+            numSS = (numSS != null && !numSS.trim().isEmpty()) ? numSS.trim() : null;
+
+            String costeContratoParam = request.getParameter("costeContrato");
+            String costeContrato = (costeContratoParam != null && !costeContratoParam.trim().isEmpty())
+                    ? costeContratoParam.trim().replace(",", ".")
+                    : null;
+
+            String tipRetribucion = request.getParameter("tipRetribucion");
+            tipRetribucion = (tipRetribucion != null && !tipRetribucion.trim().isEmpty()) ? tipRetribucion.trim()
+                    : null;
+
+            String importeSubParam = request.getParameter("importeSub");
+            String importeSub = (importeSubParam != null && !importeSubParam.trim().isEmpty())
+                    ? importeSubParam.trim().replace(",", ".")
+                    : null;
+
+            // --- Nuevos campos TITREQPUESTO y FUNCIONES ---
+            String titReqPuesto = request.getParameter("titReqPuesto"); // código del combo
+            titReqPuesto = (titReqPuesto != null && !titReqPuesto.trim().isEmpty()) ? titReqPuesto.trim() : null;
+
+            String funciones = request.getParameter("funciones");
+            if (funciones != null) {
+                funciones = funciones.trim();
+                if (funciones.length() > 200)
+                    funciones = funciones.substring(0, 200);
+                if (funciones.isEmpty())
+                    funciones = null;
+            }
 
             SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -517,6 +550,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             nuevaContratacion.setcProfesionalidad(cProfesionalidad);
             nuevaContratacion.setModalidadContrato(modalidadContrato);
             nuevaContratacion.setJornada(jornada);
+            nuevaContratacion.setTitReqPuesto(titReqPuesto);
+            nuevaContratacion.setFunciones(funciones);
             if (porcJornada != null && !"".equals(porcJornada)) {
                 nuevaContratacion.setPorcJornada(Double.parseDouble(porcJornada));
             }
@@ -541,7 +576,6 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             if (importeSub != null && !"".equals(importeSub)) {
                 nuevaContratacion.setImporteSub(Double.parseDouble(importeSub));
             }
-            
 
             MeLanbide11Manager meLanbide11Manager = MeLanbide11Manager.getInstance();
             boolean insertOK = meLanbide11Manager.crearNuevaContratacion(nuevaContratacion, adapt);
@@ -563,7 +597,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         retornarXML(xmlSalida, response);
     }
 
-    public void modificarContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+    public void modificarContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
         String codigoOperacion = "0";
         List<ContratacionVO> lista = new ArrayList<ContratacionVO>();
 
@@ -599,20 +634,30 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String cProfesionalidad = (String) request.getParameter("cProfesionalidad");
             String modalidadContrato = (String) request.getParameter("modalidadContrato");
             String jornada = (String) request.getParameter("jornada");
-            String porcJornada = (String) request.getParameter("porcJornada").replace(",", ".");
+            String porcJornadaParam = (String) request.getParameter("porcJornada");
+            String porcJornada = (porcJornadaParam != null) ? porcJornadaParam.replace(",", ".") : null;
             String horasConv = (String) request.getParameter("horasConv");
             String fechaInicio = (String) request.getParameter("fechaInicio");
-            //log.debug("++++++++fechaInicio: " + fechaInicio);
+            // log.debug("++++++++fechaInicio: " + fechaInicio);
             String fechaFin = (String) request.getParameter("fechaFin");
-            //log.debug("++++++++fechaFin: " + fechaFin);
+            // log.debug("++++++++fechaFin: " + fechaFin);
             String mesesContrato = (String) request.getParameter("mesesContrato");
             String grupoCotizacion = (String) request.getParameter("grupoCotizacion");
             String direccionCT = (String) request.getParameter("direccionCT");
             String numSS = (String) request.getParameter("numSS");
-            String costeContrato = (String) request.getParameter("costeContrato").replace(",", ".");
+            String costeContratoParam = (String) request.getParameter("costeContrato");
+            String costeContrato = (costeContratoParam != null) ? costeContratoParam.replace(",", ".") : null;
             String tipRetribucion = (String) request.getParameter("tipRetribucion");
 
-            String importeSub = (String) request.getParameter("importeSub").replace(",", ".");
+            String importeSubParam = (String) request.getParameter("importeSub");
+            String importeSub = (importeSubParam != null) ? importeSubParam.replace(",", ".") : null;
+
+            // Nuevos campos TITREQPUESTO y FUNCIONES (modificar)
+            String titReqPuesto = (String) request.getParameter("titReqPuesto");
+            String funciones = request.getParameter("funciones");
+            if (funciones != null && funciones.length() > 200) {
+                funciones = funciones.substring(0, 200);
+            }
 
             if (id == null || id.equals("")) {
                 log.debug("No se ha recibido desde la JSP el id de la contrataciï¿½n a modificar ");
@@ -623,7 +668,6 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 datModif.setId(Integer.parseInt(id));
 
                 SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-                
 
                 datModif.setNumExp(numExp);
 
@@ -657,6 +701,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 datModif.setcProfesionalidad(cProfesionalidad);
                 datModif.setModalidadContrato(modalidadContrato);
                 datModif.setJornada(jornada);
+                datModif.setTitReqPuesto(titReqPuesto);
+                datModif.setFunciones(funciones);
                 datModif.setPorcJornada(null);
                 if (porcJornada != null && !"".equals(porcJornada)) {
                     datModif.setPorcJornada(Double.parseDouble(porcJornada));
@@ -686,7 +732,6 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 if (importeSub != null && !"".equals(importeSub)) {
                     datModif.setImporteSub(Double.parseDouble(importeSub));
                 }
-            
 
                 MeLanbide11Manager meLanbide11Manager = MeLanbide11Manager.getInstance();
                 boolean modOK = meLanbide11Manager.modificarContratacion(datModif, adapt);
@@ -1626,6 +1671,66 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             }
         }
         return out.toString();
+    }
+
+    /**
+     * Endpoint AJAX para obtener la suma de complementos salariales y extrasalariales
+     * por DNI y expediente.
+     * Responde directamente con JSON: {"salariales":123.45,"extrasalariales":67.89}
+     */
+    public String getComplementosPorTipo(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String dni = request.getParameter("dni");
+            String numExp = request.getParameter("numExp");
+
+            if (numExp == null) {
+                numExp = numExpediente;
+            }
+
+            AdaptadorSQLBD adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+            ComplementosPorTipo complementos = null;
+            try {
+                complementos = MeLanbide11Manager.getInstance().getSumaComplementosPorTipo(numExp, dni, adapt);
+            } catch (Exception daoEx) {
+                log.error("[getComplementosPorTipo] Error DAO obteniendo complementos", daoEx);
+            }
+            if (complementos == null) {
+                log.warn("[getComplementosPorTipo] complementos es null -> se devuelven 0,0");
+                // Crear dummy para evitar NPE
+                complementos = new ComplementosPorTipo(0d, 0d);
+            }
+
+            // Crear respuesta JSON simple
+            StringBuilder json = new StringBuilder();
+            json.append("{");
+            json.append("\"salariales\":").append(complementos.getSalariales()).append(",");
+            json.append("\"extrasalariales\":").append(complementos.getExtrasalariales());
+            json.append("}");
+
+            response.setContentType("application/json; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
+            PrintWriter out = response.getWriter();
+            out.print(json.toString());
+            out.flush();
+            // No navegamos a JSP: respuesta directa JSON
+            return null;
+        } catch (Exception ex) {
+            log.error("Error al obtener complementos por tipo", ex);
+            try {
+                response.setContentType("application/json; charset=UTF-8");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter out = response.getWriter();
+                out.print("{\"salariales\":0,\"extrasalariales\":0}");
+                out.flush();
+            } catch (Exception ioEx) {
+                log.error("Error enviando respuesta de error", ioEx);
+            }
+            return null;
+        }
     }
 
 }
