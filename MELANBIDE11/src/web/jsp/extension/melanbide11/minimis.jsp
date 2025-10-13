@@ -38,7 +38,7 @@ int idiomaUsuario = 1;
                 css = usuarioVO.getCss();
         }
 
-    //Clase para internacionalizar los mensajes de la aplicación.
+    //Clase para internacionalizar los mensajes de la aplicaciï¿½n.
     MeLanbide11I18n meLanbide11I18n = MeLanbide11I18n.getInstance();
     String numExpediente = (String)request.getAttribute("numExp");
     
@@ -50,7 +50,7 @@ int idiomaUsuario = 1;
 <script type="text/javascript">
 
     function pulsarNuevoMinimis() {
-        lanzarPopUpModal('<%=request.getContextPath()%>/PeticionModuloIntegracion.do?tarea=preparar&modulo=MELANBIDE11&operacion=cargarNuevaMinimis&tipo=0&numExp=<%=numExpediente%>&nuevo=1', 750, 1200, 'no', 'no', function (result) {
+        lanzarPopUpModal('<%=request.getContextPath()%>/PeticionModuloIntegracion.do?tarea=preparar&modulo=MELANBIDE11&operacion=cargarNuevaMinimis&tipo=0&numExp=<%=numExpediente%>&nuevo=1', 900, 1200, 'no', 'no', function (result) {
             if (result != undefined) {
                 if (result[0] == '0') {
                     recargarTablaMinimis(result);
@@ -61,7 +61,7 @@ int idiomaUsuario = 1;
 
     function pulsarModificarMinimis() {
         if (tablaMinimis.selectedIndex != -1) {
-            lanzarPopUpModal('<%=request.getContextPath()%>/PeticionModuloIntegracion.do?tarea=preparar&modulo=MELANBIDE11&operacion=cargarModificarMinimis&tipo=0&nuevo=0&numExp=<%=numExpediente%>&id=' + listaMinimis[tablaMinimis.selectedIndex][0], 750, 1200, 'no', 'no', function (result) {
+            lanzarPopUpModal('<%=request.getContextPath()%>/PeticionModuloIntegracion.do?tarea=preparar&modulo=MELANBIDE11&operacion=cargarModificarMinimis&tipo=0&nuevo=0&numExp=<%=numExpediente%>&id=' + listaMinimis[tablaMinimis.selectedIndex][0], 900, 1200, 'no', 'no', function (result) {
                 if (result != undefined) {
                     if (result[0] == '0') {
                         recargarTablaMinimis(result);
@@ -294,7 +294,7 @@ int idiomaUsuario = 1;
                             if(idiomaUsuario==ConstantesMeLanbide11.CODIGO_IDIOMA_EUSKERA){
                                 descripcion=descripcionDobleIdioma[1];
                             }else{
-                                // Cogemos la primera posición que debería ser castellano
+                                // Cogemos la primera posiciï¿½n que deberï¿½a ser castellano
                                 descripcion=descripcionDobleIdioma[0];
                             }
                         }
