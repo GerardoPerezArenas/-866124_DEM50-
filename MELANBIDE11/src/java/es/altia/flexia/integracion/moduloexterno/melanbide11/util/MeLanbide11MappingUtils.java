@@ -6,6 +6,8 @@ import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.MinimisVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DatosTablaDesplegableExtVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesplegableAdmonLocalVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesplegableExternoVO;
+import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRetribucionVO;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -177,6 +179,40 @@ public class MeLanbide11MappingUtils {
         valoresDesplegable.setCampoCodigo(rs.getString(campoCodigo));
         valoresDesplegable.setCampoValor(rs.getString(campoValor));
         return valoresDesplegable;
+    }
+    
+    public Object mapDesgloseRetribucion(ResultSet rs, Class clazz) throws Exception {
+        if (clazz == DesgloseRetribucionVO.class) {
+            return mapearDesgloseRetribucionVO(rs);
+        }
+        return null;
+    }
+    
+    private Object mapearDesgloseRetribucionVO(ResultSet rs) throws SQLException {
+        DesgloseRetribucionVO desglose = new DesgloseRetribucionVO();
+        
+        desglose.setId(rs.getInt("ID"));
+        if (rs.wasNull()) {
+            desglose.setId(null);
+        }
+        
+        desglose.setNumExp(rs.getString("NUM_EXP"));
+        desglose.setDni(rs.getString("DNI"));
+        
+        Integer tipo = rs.getInt("TIPO");
+        if (!rs.wasNull()) {
+            desglose.setTipo(tipo);
+        }
+        
+        Double importe = rs.getDouble("IMPORTE");
+        if (!rs.wasNull()) {
+            desglose.setImporte(BigDecimal.valueOf(importe));
+        }
+        
+        desglose.setConcepto(rs.getString("CONCEPTO"));
+        desglose.setObservaciones(rs.getString("OBSERVACIONES"));
+        
+        return desglose;
     }
 
 }
