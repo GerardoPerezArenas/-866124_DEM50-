@@ -16,8 +16,6 @@ import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesplegableAdmon
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesplegableExternoVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRetribucionVO;
 import java.math.BigDecimal;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import es.altia.flexia.integracion.moduloexterno.plugin.ModuloIntegracionExterno;
 import es.altia.technical.PortableContext;
 import es.altia.util.conexion.AdaptadorSQLBD;
@@ -1273,32 +1271,33 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             
             // Si no hay DNI, devolver respuesta vacía
             if (dni == null || dni.trim().isEmpty()) {
-                JSONObject jsonResponse = new JSONObject();
-                jsonResponse.put("dni", "");
-                jsonResponse.put("lineas", new JSONArray());
-                out.print(jsonResponse.toString());
+                String jsonResponse = "{\"dni\":\"\",\"lineas\":[]}";
+                out.print(jsonResponse);
                 return;
             }
             
             // Obtener las líneas de desglose
             List<DesgloseRetribucionVO> lineas = MeLanbide11Manager.getInstance().getLineasDesgloseRSB(numExpediente, dni, adapt);
             
-            // Construir respuesta JSON
-            JSONObject jsonResponse = new JSONObject();
-            jsonResponse.put("dni", dni);
+            // Construir respuesta JSON manualmente
+            StringBuilder jsonResponse = new StringBuilder();
+            jsonResponse.append("{\"dni\":\"").append(escapeJson(dni)).append("\",\"lineas\":[");
             
-            JSONArray jsonLineas = new JSONArray();
-            if (lineas != null) {
-                for (DesgloseRetribucionVO linea : lineas) {
-                    JSONObject jsonLinea = new JSONObject();
-                    jsonLinea.put("tipo", linea.getTipo() != null ? linea.getTipo() : 1);
-                    jsonLinea.put("importe", linea.getImporte() != null ? linea.getImporte().doubleValue() : 0.0);
-                    jsonLinea.put("concepto", linea.getConcepto() != null ? linea.getConcepto() : "");
-                    jsonLinea.put("observ", linea.getObservaciones() != null ? linea.getObservaciones() : "");
-                    jsonLineas.put(jsonLinea);
+            if (lineas != null && !lineas.isEmpty()) {
+                for (int i = 0; i < lineas.size(); i++) {
+                    DesgloseRetribucionVO linea = lineas.get(i);
+                    if (i > 0) {
+                        jsonResponse.append(",");
+                    }
+                    jsonResponse.append("{");
+                    jsonResponse.append("\"tipo\":").append(linea.getTipo() != null ? linea.getTipo() : 1).append(",");
+                    jsonResponse.append("\"importe\":").append(linea.getImporte() != null ? linea.getImporte().doubleValue() : 0.0).append(",");
+                    jsonResponse.append("\"concepto\":\"").append(escapeJson(linea.getConcepto() != null ? linea.getConcepto() : "")).append("\",");
+                    jsonResponse.append("\"observ\":\"").append(escapeJson(linea.getObservaciones() != null ? linea.getObservaciones() : "")).append("\"");
+                    jsonResponse.append("}");
                 }
             }
-            jsonResponse.put("lineas", jsonLineas);
+            jsonResponse.append("]}");
             
             out.print(jsonResponse.toString());
             
@@ -1306,10 +1305,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             log.error("Error en listarLineasDesgloseRSB", ex);
             try {
                 if (out != null) {
-                    JSONObject errorResponse = new JSONObject();
-                    errorResponse.put("error", true);
-                    errorResponse.put("mensaje", "Error al listar líneas de desglose");
-                    out.print(errorResponse.toString());
+                    String errorResponse = "{\"error\":true,\"mensaje\":\"Error al listar líneas de desglose\"}";
+                    out.print(errorResponse);
                 }
             } catch (Exception e) {
                 log.error("Error escribiendo respuesta de error", e);
@@ -1341,11 +1338,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             
             // Validar parámetros
             if (dni == null || dni.trim().isEmpty()) {
-                JSONObject errorResponse = new JSONObject();
-                JSONObject resultado = new JSONObject();
-                resultado.put("codigoOperacion", "3"); // Parámetros insuficientes
-                errorResponse.put("resultado", resultado);
-                out.print(errorResponse.toString());
+                String errorResponse = "{\"resultado\":{\"codigoOperacion\":\"3\"}}"; // Parámetros insuficientes
+                out.print(errorResponse);
                 return;
             }
             
@@ -1388,23 +1382,18 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             // Guardar líneas
             boolean exito = MeLanbide11Manager.getInstance().guardarLineasDesgloseRSB(numExpediente, dni, lineas, adapt);
             
-            // Construir respuesta
-            JSONObject jsonResponse = new JSONObject();
-            JSONObject resultado = new JSONObject();
-            resultado.put("codigoOperacion", exito ? "0" : "1"); // 0=éxito, 1=error
-            jsonResponse.put("resultado", resultado);
+            // Construir respuesta JSON manualmente
+            String codigoOperacion = exito ? "0" : "1"; // 0=éxito, 1=error
+            String jsonResponse = "{\"resultado\":{\"codigoOperacion\":\"" + codigoOperacion + "\"}}";
             
-            out.print(jsonResponse.toString());
+            out.print(jsonResponse);
             
         } catch (Exception ex) {
             log.error("Error en guardarLineasDesgloseRSB", ex);
             try {
                 if (out != null) {
-                    JSONObject errorResponse = new JSONObject();
-                    JSONObject resultado = new JSONObject();
-                    resultado.put("codigoOperacion", "1"); // Error
-                    errorResponse.put("resultado", resultado);
-                    out.print(errorResponse.toString());
+                    String errorResponse = "{\"resultado\":{\"codigoOperacion\":\"1\"}}"; // Error
+                    out.print(errorResponse);
                 }
             } catch (Exception e) {
                 log.error("Error escribiendo respuesta de error", e);
@@ -1415,6 +1404,20 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 out.close();
             }
         }
+    }
+    
+    /**
+     * Escapa caracteres especiales para JSON
+     */
+    private String escapeJson(String str) {
+        if (str == null) {
+            return "";
+        }
+        return str.replace("\\", "\\\\")
+                  .replace("\"", "\\\"")
+                  .replace("\n", "\\n")
+                  .replace("\r", "\\r")
+                  .replace("\t", "\\t");
     }
     
     

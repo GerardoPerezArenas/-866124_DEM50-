@@ -605,9 +605,6 @@ public class MeLanbide11Manager {
             con = adapt.getConnection();
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             return meLanbide11DAO.getLineasDesgloseRSB(numExp, dni, con);
-        } catch (BDException e) {
-            log.error("Excepción en BBDD recuperando líneas desglose RSB para numExp=" + numExp + ", dni=" + dni, e);
-            throw new Exception(e);
         } catch (Exception ex) {
             log.error("Excepción recuperando líneas desglose RSB para numExp=" + numExp + ", dni=" + dni, ex);
             throw new Exception(ex);
@@ -646,16 +643,6 @@ public class MeLanbide11Manager {
             
             con.commit(); // Confirmar transacción
             return true;
-        } catch (BDException e) {
-            if (con != null) {
-                try {
-                    con.rollback();
-                } catch (Exception rollbackEx) {
-                    log.error("Error haciendo rollback", rollbackEx);
-                }
-            }
-            log.error("Excepción en BBDD guardando líneas desglose RSB para numExp=" + numExp + ", dni=" + dni, e);
-            throw new Exception(e);
         } catch (Exception ex) {
             if (con != null) {
                 try {
