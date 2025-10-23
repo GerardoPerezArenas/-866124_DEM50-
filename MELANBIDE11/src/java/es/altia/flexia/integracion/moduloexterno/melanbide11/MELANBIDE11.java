@@ -18,6 +18,11 @@ import es.altia.flexia.integracion.moduloexterno.plugin.ModuloIntegracionExterno
 import es.altia.technical.PortableContext;
 import es.altia.util.conexion.AdaptadorSQLBD;
 import es.altia.util.conexion.BDException;
+import es.altia.flexia.integracion.moduloexterno.melanbide11.dao.MeLanbide11DAO.ComplementosPorTipo;
+import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRSBVO;
+import java.util.List;
+import java.util.ArrayList;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,17 +53,18 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
     private static DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     ResourceBundle m_Conf = ResourceBundle.getBundle("common");
 
-    public void cargarExpedienteExtension(int codigoOrganizacion, String numeroExpediente, String xml) throws Exception {
+    public void cargarExpedienteExtension(int codigoOrganizacion, String numeroExpediente, String xml)
+            throws Exception {
         final Class cls = Class.forName("es.altia.flexia.integracion.moduloexterno.melanbide42.MELANBIDE42");
         final Object me42Class = cls.newInstance();
-        final Class[] types = {int.class, String.class, String.class};
+        final Class[] types = { int.class, String.class, String.class };
         final Method method = cls.getMethod("cargarExpedienteExtension", types);
 
         method.invoke(me42Class, codigoOrganizacion, numeroExpediente, xml);
     }
 
-    public String cargarPantallaPrincipal(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
-        log.debug("Entramos en cargarPantallaPrincipal de " + this.getClass().getName());
+    public String cargarPantallaPrincipal(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
         AdaptadorSQLBD adapt = null;
         try {
             adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
@@ -69,9 +75,103 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         request.setAttribute("numExp", numExpediente);
         if (adapt != null) {
             try {
-                List<ContratacionVO> listaAccesos = MeLanbide11Manager.getInstance().getDatosContratacion(numExpediente, codOrganizacion, adapt);
+                List<ContratacionVO> listaAccesos = MeLanbide11Manager.getInstance().getDatosContratacion(numExpediente,
+                        codOrganizacion, adapt);
                 if (listaAccesos.size() > 0) {
                     request.setAttribute("listaAccesos", listaAccesos);
+                }
+
+                List<DesplegableAdmonLocalVO> listaSexo = MeLanbide11Manager.getInstance()
+                        .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                                ConstantesMeLanbide11.COD_DES_SEXO, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+                if (listaSexo.size() > 0) {
+                    listaSexo = traducirDesplegable(request, listaSexo);
+                    request.setAttribute("listaSexo", listaSexo);
+                }
+
+                List<DesplegableAdmonLocalVO> listaMayor55 = MeLanbide11Manager.getInstance()
+                        .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                                ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+                if (listaMayor55.size() > 0) {
+                    listaMayor55 = traducirDesplegable(request, listaMayor55);
+                    request.setAttribute("listaMayor55", listaMayor55);
+                }
+
+                List<DesplegableAdmonLocalVO> listaFinFormativa = MeLanbide11Manager.getInstance()
+                        .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                                ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+                if (listaFinFormativa.size() > 0) {
+                    listaFinFormativa = traducirDesplegable(request, listaFinFormativa);
+                    request.setAttribute("listaFinFormativa", listaFinFormativa);
+                }
+
+                List<DesplegableAdmonLocalVO> listaJornada = MeLanbide11Manager.getInstance()
+                        .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                                ConstantesMeLanbide11.COD_DES_JORN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+                if (listaJornada.size() > 0) {
+                    listaJornada = traducirDesplegable(request, listaJornada);
+                    request.setAttribute("listaJornada", listaJornada);
+                }
+
+                List<DesplegableAdmonLocalVO> listaGrupoCotizacion = MeLanbide11Manager.getInstance()
+                        .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                                ConstantesMeLanbide11.COD_DES_GCOT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+                if (listaGrupoCotizacion.size() > 0) {
+                    listaGrupoCotizacion = traducirDesplegable(request, listaGrupoCotizacion);
+                    request.setAttribute("listaGrupoCotizacion", listaGrupoCotizacion);
+                }
+
+                List<DesplegableAdmonLocalVO> listaTipRetribucion = MeLanbide11Manager.getInstance()
+                        .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                                ConstantesMeLanbide11.COD_DES_DTRT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+                if (listaTipRetribucion.size() > 0) {
+                    listaTipRetribucion = traducirDesplegable(request, listaTipRetribucion);
+                    request.setAttribute("listaTipRetribucion", listaTipRetribucion);
+                }
+
+                DatosTablaDesplegableExtVO datosTablaDesplegableOcupaciones = MeLanbide11Manager.getInstance()
+                        .getDatosMapeoDesplegableExterno(
+                                ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_OCIN,
+                                        ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                                adapt);
+                String tablaOcupaciones = datosTablaDesplegableOcupaciones.getTabla();
+                String campoCodigoOcupaciones = datosTablaDesplegableOcupaciones.getCampoCodigo();
+                String campoValorOcupaciones = datosTablaDesplegableOcupaciones.getCampoValor();
+                List<DesplegableExternoVO> listaOcupacion = MeLanbide11Manager.getInstance()
+                        .getValoresDesplegablesExternos(tablaOcupaciones, campoCodigoOcupaciones, campoValorOcupaciones,
+                                adapt);
+                if (listaOcupacion.size() > 0) {
+                    request.setAttribute("listaOcupacion", listaOcupacion);
+                }
+
+                DatosTablaDesplegableExtVO datosTablaDesplegableTitulaciones = MeLanbide11Manager.getInstance()
+                        .getDatosMapeoDesplegableExterno(
+                                ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_TIIN,
+                                        ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                                adapt);
+                String tablaTitulaciones = datosTablaDesplegableTitulaciones.getTabla();
+                String campoCodigoTitulaciones = datosTablaDesplegableTitulaciones.getCampoCodigo();
+                String campoValorTitulaciones = datosTablaDesplegableTitulaciones.getCampoValor();
+                List<DesplegableExternoVO> listaTitulacion = MeLanbide11Manager.getInstance()
+                        .getValoresDesplegablesExternos(tablaTitulaciones, campoCodigoTitulaciones,
+                                campoValorTitulaciones, adapt);
+                if (listaTitulacion.size() > 0) {
+                    request.setAttribute("listaTitulacion", listaTitulacion);
+                }
+
+                DatosTablaDesplegableExtVO datosTablaDesplegableCProfesionales = MeLanbide11Manager.getInstance()
+                        .getDatosMapeoDesplegableExterno(
+                                ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_CPIN,
+                                        ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                                adapt);
+                String tablaCProfesionales = datosTablaDesplegableCProfesionales.getTabla();
+                String campoCodigoCProfesionales = datosTablaDesplegableCProfesionales.getCampoCodigo();
+                String campoValorCProfesionales = datosTablaDesplegableCProfesionales.getCampoValor();
+                List<DesplegableExternoVO> listaCProfesionalidad = MeLanbide11Manager.getInstance()
+                        .getValoresDesplegablesExternos(tablaCProfesionales, campoCodigoCProfesionales,
+                                campoValorCProfesionales, adapt);
+                if (listaCProfesionalidad.size() > 0) {
+                    request.setAttribute("listaCProfesionalidad", listaCProfesionalidad);
                 }
 
             } catch (Exception ex) {
@@ -82,9 +182,9 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
 
         return url;
     }
-    
-    public String cargarPantallaMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
-        log.debug("Entramos en cargarPantallaMinimis de " + this.getClass().getName());
+
+    public String cargarPantallaMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
         AdaptadorSQLBD adapt = null;
         try {
             adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
@@ -95,7 +195,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         request.setAttribute("numExp", numExpediente);
         if (adapt != null) {
             try {
-                List<MinimisVO> listaMinimis = MeLanbide11Manager.getInstance().getDatosMinimis(numExpediente, codOrganizacion, adapt);
+                List<MinimisVO> listaMinimis = MeLanbide11Manager.getInstance().getDatosMinimis(numExpediente,
+                        codOrganizacion, adapt);
                 if (listaMinimis.size() > 0) {
                     request.setAttribute("listaMinimis", listaMinimis);
                 }
@@ -108,22 +209,45 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
 
         return url;
     }
-    
-    private List<DesplegableAdmonLocalVO> traducirDesplegable(HttpServletRequest request, List<DesplegableAdmonLocalVO> desplegable){
-        
+
+    public String cargarListaDesglose(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
+        // Compatibilidad hacia atr�s: esta operaci�n antigua mostraba un listado
+        // simple.
+        // Ahora redirigimos al nuevo flujo de Desglose RSB (modal con pesta�as).
+        try {
+            if (request.getAttribute("numExp") == null) {
+                request.setAttribute("numExp", numExpediente);
+            }
+        } catch (Exception ignore) {
+        }
+        return cargarDesgloseRSB(codOrganizacion, codTramite, ocurrenciaTramite, numExpediente, request, response);
+    }
+
+    public String irDesgloseRSB(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
+        request.setAttribute("numExp", numExpediente);
+        return "/jsp/extension/melanbide11/desglose/m11Desglose.jsp";
+    }
+
+    private List<DesplegableAdmonLocalVO> traducirDesplegable(HttpServletRequest request,
+            List<DesplegableAdmonLocalVO> desplegable) {
+
         for (DesplegableAdmonLocalVO d : desplegable) {
-            if (d.getDes_nom() != null && !d.getDes_nom().equals("") ){
+            if (d.getDes_nom() != null && !d.getDes_nom().equals("")) {
                 d.setDes_nom(getDescripcionDesplegable(request, d.getDes_nom()));
             }
         }
-        
+
         return desplegable;
     }
-    
-    public String cargarNuevaContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+
+    public String cargarNuevaContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
         String nuevo = "1";
         String numExp = "";
-        String urlnuevaContratacion = "/jsp/extension/melanbide11/nuevaContratacion.jsp?codOrganizacion=" + codOrganizacion;
+        String urlnuevaContratacion = "/jsp/extension/melanbide11/nuevaContratacion.jsp?codOrganizacion="
+                + codOrganizacion;
         try {
             if (request.getAttribute("nuevo") != null) {
                 if (request.getAttribute("nuevo").toString().equals("0")) {
@@ -136,72 +260,126 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 numExp = request.getParameter("numExp").toString();
                 request.setAttribute("numExp", numExp);
             }
-            //Cargamos en el request los valores de los desplegables
-            List<DesplegableAdmonLocalVO> listaSexo = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_SEXO, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            // Cargamos en el request los valores de los desplegables
+            List<DesplegableAdmonLocalVO> listaSexo = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_SEXO,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             if (listaSexo.size() > 0) {
                 listaSexo = traducirDesplegable(request, listaSexo);
                 request.setAttribute("listaSexo", listaSexo);
             }
-            List<DesplegableAdmonLocalVO> listaMayor55 = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            List<DesplegableAdmonLocalVO> listaMayor55 = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             if (listaMayor55.size() > 0) {
                 listaMayor55 = traducirDesplegable(request, listaMayor55);
                 request.setAttribute("listaMayor55", listaMayor55);
             }
-            List<DesplegableAdmonLocalVO> listaFinFormativa = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            List<DesplegableAdmonLocalVO> listaFinFormativa = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             if (listaFinFormativa.size() > 0) {
                 listaFinFormativa = traducirDesplegable(request, listaFinFormativa);
                 request.setAttribute("listaFinFormativa", listaFinFormativa);
             }
-            List<DesplegableAdmonLocalVO> listaJornada = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_JORN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            List<DesplegableAdmonLocalVO> listaJornada = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_JORN,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             if (listaJornada.size() > 0) {
                 listaJornada = traducirDesplegable(request, listaJornada);
                 request.setAttribute("listaJornada", listaJornada);
             }
-            List<DesplegableAdmonLocalVO> listaGrupoCotizacion = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_GCOT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            List<DesplegableAdmonLocalVO> listaGrupoCotizacion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_GCOT,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             if (listaGrupoCotizacion.size() > 0) {
                 listaGrupoCotizacion = traducirDesplegable(request, listaGrupoCotizacion);
                 request.setAttribute("listaGrupoCotizacion", listaGrupoCotizacion);
             }
-            List<DesplegableAdmonLocalVO> listaTipRetribucion = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTRT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            List<DesplegableAdmonLocalVO> listaTipRetribucion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTRT,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             if (listaTipRetribucion.size() > 0) {
                 listaTipRetribucion = traducirDesplegable(request, listaTipRetribucion);
                 request.setAttribute("listaTipRetribucion", listaTipRetribucion);
             }
-            
-            //Desplegables externos
-            DatosTablaDesplegableExtVO datosTablaDesplegableOcupaciones = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_OCIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            List<DesplegableAdmonLocalVO> listaTitReqPuesto = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_TITREQPUESTO,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            if (listaTitReqPuesto != null && listaTitReqPuesto.size() > 0) {
+                listaTitReqPuesto = traducirDesplegable(request, listaTitReqPuesto);
+            } else {
+                listaTitReqPuesto = new ArrayList<DesplegableAdmonLocalVO>();
+            }
+            request.setAttribute("listaTitReqPuesto", listaTitReqPuesto);
+
+            DatosTablaDesplegableExtVO datosTablaDesplegableOcupaciones = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_OCIN,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             String tablaOcupaciones = datosTablaDesplegableOcupaciones.getTabla();
             String campoCodigoOcupaciones = datosTablaDesplegableOcupaciones.getCampoCodigo();
             String campoValorOcupaciones = datosTablaDesplegableOcupaciones.getCampoValor();
-            List<DesplegableExternoVO> listaOcupacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaOcupaciones, campoCodigoOcupaciones, campoValorOcupaciones, this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            List<DesplegableExternoVO> listaOcupacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(
+                    tablaOcupaciones, campoCodigoOcupaciones, campoValorOcupaciones,
+                    this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             if (listaOcupacion.size() > 0) {
                 request.setAttribute("listaOcupacion", listaOcupacion);
             }
-            DatosTablaDesplegableExtVO datosTablaDesplegableTitulaciones = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_TIIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            DatosTablaDesplegableExtVO datosTablaDesplegableTitulaciones = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_TIIN,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             String tablaTitulaciones = datosTablaDesplegableTitulaciones.getTabla();
             String campoCodigoTitulaciones = datosTablaDesplegableTitulaciones.getCampoCodigo();
             String campoValorTitulaciones = datosTablaDesplegableTitulaciones.getCampoValor();
-            List<DesplegableExternoVO> listaTitulacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaTitulaciones, campoCodigoTitulaciones, campoValorTitulaciones, this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            List<DesplegableExternoVO> listaTitulacion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesExternos(tablaTitulaciones, campoCodigoTitulaciones, campoValorTitulaciones,
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             if (listaTitulacion.size() > 0) {
                 request.setAttribute("listaTitulacion", listaTitulacion);
             }
-            DatosTablaDesplegableExtVO datosTablaDesplegableCProfesionales = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_CPIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            DatosTablaDesplegableExtVO datosTablaDesplegableCProfesionales = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_CPIN,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             String tablaCProfesionales = datosTablaDesplegableCProfesionales.getTabla();
             String campoCodigoCProfesionales = datosTablaDesplegableCProfesionales.getCampoCodigo();
             String campoValorCProfesionales = datosTablaDesplegableCProfesionales.getCampoValor();
-            List<DesplegableExternoVO> listaCProfesionalidad = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaCProfesionales, campoCodigoCProfesionales, campoValorCProfesionales, this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            List<DesplegableExternoVO> listaCProfesionalidad = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesExternos(tablaCProfesionales, campoCodigoCProfesionales,
+                            campoValorCProfesionales, this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             if (listaCProfesionalidad.size() > 0) {
                 request.setAttribute("listaCProfesionalidad", listaCProfesionalidad);
             }
         } catch (Exception ex) {
-            log.debug("Se ha presentado un error al intentar preparar la jsp de una nueva contrataci�n : " + ex.getMessage());
+            log.error("Error al intentar preparar la jsp de una nueva contratacion: " + ex.getMessage(), ex);
         }
         return urlnuevaContratacion;
     }
 
-    public String cargarModificarContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+    public String cargarModificarContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
         String nuevo = "0";
-        String urlnuevaContratacion = "/jsp/extension/melanbide11/nuevaContratacion.jsp?codOrganizacion=" + codOrganizacion;
+        String urlnuevaContratacion = "/jsp/extension/melanbide11/nuevaContratacion.jsp?codOrganizacion="
+                + codOrganizacion;
         try {
             if (request.getAttribute("nuevo") != null) {
                 if (!request.getAttribute("nuevo").toString().equals("0")) {
@@ -213,83 +391,184 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String id = request.getParameter("id");
             // Recuperramos datos e Acceso a modificar y cargamos en el request
             if (id != null && !id.equals("")) {
-                ContratacionVO datModif = MeLanbide11Manager.getInstance().getContratacionPorID(id, this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+                ContratacionVO datModif = MeLanbide11Manager.getInstance().getContratacionPorID(id,
+                        this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
                 if (datModif != null) {
                     request.setAttribute("datModif", datModif);
                 }
             }
-            //Cargamos el el request los valores  de los desplegables
-            List<DesplegableAdmonLocalVO> listaSexo = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_SEXO, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
-            if (listaSexo.size() > 0) {
+            // Cargamos el el request los valores de los desplegables
+            List<DesplegableAdmonLocalVO> listaSexo = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_SEXO,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            log.info("cargarModificarContratacion - listaSexo cargada: "
+                    + (listaSexo != null ? listaSexo.size() : "null") + " elementos");
+            if (listaSexo != null && listaSexo.size() > 0) {
                 listaSexo = traducirDesplegable(request, listaSexo);
-                request.setAttribute("listaSexo", listaSexo);
+            } else {
+                log.warn("cargarModificarContratacion - listaSexo est� vac�a o null, inicializando lista vac�a");
+                listaSexo = new ArrayList<DesplegableAdmonLocalVO>();
             }
-            List<DesplegableAdmonLocalVO> listaMayor55 = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
-            if (listaMayor55.size() > 0) {
+            request.setAttribute("listaSexo", listaSexo);
+            List<DesplegableAdmonLocalVO> listaMayor55 = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            log.info("cargarModificarContratacion - listaMayor55 cargada: "
+                    + (listaMayor55 != null ? listaMayor55.size() : "null") + " elementos");
+            if (listaMayor55 != null && listaMayor55.size() > 0) {
                 listaMayor55 = traducirDesplegable(request, listaMayor55);
-                request.setAttribute("listaMayor55", listaMayor55);
+            } else {
+                log.warn("cargarModificarContratacion - listaMayor55 est� vac�a o null, inicializando lista vac�a");
+                listaMayor55 = new ArrayList<DesplegableAdmonLocalVO>();
             }
-            List<DesplegableAdmonLocalVO> listaFinFormativa = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
-            if (listaFinFormativa.size() > 0) {
+            request.setAttribute("listaMayor55", listaMayor55);
+            List<DesplegableAdmonLocalVO> listaFinFormativa = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            log.info("cargarModificarContratacion - listaFinFormativa cargada: "
+                    + (listaFinFormativa != null ? listaFinFormativa.size() : "null") + " elementos");
+            if (listaFinFormativa != null && listaFinFormativa.size() > 0) {
                 listaFinFormativa = traducirDesplegable(request, listaFinFormativa);
-                request.setAttribute("listaFinFormativa", listaFinFormativa);
+            } else {
+                log.warn(
+                        "cargarModificarContratacion - listaFinFormativa est� vac�a o null, inicializando lista vac�a");
+                listaFinFormativa = new ArrayList<DesplegableAdmonLocalVO>();
             }
-            List<DesplegableAdmonLocalVO> listaJornada = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_JORN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
-            if (listaJornada.size() > 0) {
+            request.setAttribute("listaFinFormativa", listaFinFormativa);
+            List<DesplegableAdmonLocalVO> listaJornada = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_JORN,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            log.info("cargarModificarContratacion - listaJornada cargada: "
+                    + (listaJornada != null ? listaJornada.size() : "null") + " elementos");
+            if (listaJornada != null && listaJornada.size() > 0) {
                 listaJornada = traducirDesplegable(request, listaJornada);
-                request.setAttribute("listaJornada", listaJornada);
+            } else {
+                log.warn("cargarModificarContratacion - listaJornada est� vac�a o null, inicializando lista vac�a");
+                listaJornada = new ArrayList<DesplegableAdmonLocalVO>();
             }
-            List<DesplegableAdmonLocalVO> listaGrupoCotizacion = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_GCOT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
-            if (listaGrupoCotizacion.size() > 0) {
+            request.setAttribute("listaJornada", listaJornada);
+            List<DesplegableAdmonLocalVO> listaGrupoCotizacion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_GCOT,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            log.info("cargarModificarContratacion - listaGrupoCotizacion cargada: "
+                    + (listaGrupoCotizacion != null ? listaGrupoCotizacion.size() : "null") + " elementos");
+            if (listaGrupoCotizacion != null && listaGrupoCotizacion.size() > 0) {
                 listaGrupoCotizacion = traducirDesplegable(request, listaGrupoCotizacion);
-                request.setAttribute("listaGrupoCotizacion", listaGrupoCotizacion);
+            } else {
+                log.warn(
+                        "cargarModificarContratacion - listaGrupoCotizacion est� vac�a o null, inicializando lista vac�a");
+                listaGrupoCotizacion = new ArrayList<DesplegableAdmonLocalVO>();
             }
-            List<DesplegableAdmonLocalVO> listaTipRetribucion = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTRT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
-            if (listaTipRetribucion.size() > 0) {
+            request.setAttribute("listaGrupoCotizacion", listaGrupoCotizacion);
+            List<DesplegableAdmonLocalVO> listaTipRetribucion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTRT,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            log.info("cargarModificarContratacion - listaTipRetribucion cargada: "
+                    + (listaTipRetribucion != null ? listaTipRetribucion.size() : "null") + " elementos");
+            if (listaTipRetribucion != null && listaTipRetribucion.size() > 0) {
                 listaTipRetribucion = traducirDesplegable(request, listaTipRetribucion);
-                request.setAttribute("listaTipRetribucion", listaTipRetribucion);
+            } else {
+                log.warn(
+                        "cargarModificarContratacion - listaTipRetribucion est� vac�a o null, inicializando lista vac�a");
+                listaTipRetribucion = new ArrayList<DesplegableAdmonLocalVO>();
             }
-            
-            //Desplegables externos
-            DatosTablaDesplegableExtVO datosTablaDesplegableOcupaciones = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_OCIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            request.setAttribute("listaTipRetribucion", listaTipRetribucion);
+            List<DesplegableAdmonLocalVO> listaTitReqPuesto = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_TITREQPUESTO,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            if (listaTitReqPuesto != null && listaTitReqPuesto.size() > 0) {
+                listaTitReqPuesto = traducirDesplegable(request, listaTitReqPuesto);
+            } else {
+                listaTitReqPuesto = new ArrayList<DesplegableAdmonLocalVO>();
+            }
+            request.setAttribute("listaTitReqPuesto", listaTitReqPuesto);
+
+            // Desplegables externos
+            DatosTablaDesplegableExtVO datosTablaDesplegableOcupaciones = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_OCIN,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             String tablaOcupaciones = datosTablaDesplegableOcupaciones.getTabla();
             String campoCodigoOcupaciones = datosTablaDesplegableOcupaciones.getCampoCodigo();
             String campoValorOcupaciones = datosTablaDesplegableOcupaciones.getCampoValor();
-            List<DesplegableExternoVO> listaOcupacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaOcupaciones, campoCodigoOcupaciones, campoValorOcupaciones, this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
-            if (listaOcupacion.size() > 0) {
-                request.setAttribute("listaOcupacion", listaOcupacion);
+            List<DesplegableExternoVO> listaOcupacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(
+                    tablaOcupaciones, campoCodigoOcupaciones, campoValorOcupaciones,
+                    this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            log.info("cargarModificarContratacion - listaOcupacion cargada: "
+                    + (listaOcupacion != null ? listaOcupacion.size() : "null") + " elementos");
+            if (listaOcupacion == null || listaOcupacion.size() == 0) {
+                log.warn("cargarModificarContratacion - listaOcupacion est� vac�a o null, inicializando lista vac�a");
+                listaOcupacion = new ArrayList<DesplegableExternoVO>();
             }
-            DatosTablaDesplegableExtVO datosTablaDesplegableTitulaciones = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_TIIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            request.setAttribute("listaOcupacion", listaOcupacion);
+            DatosTablaDesplegableExtVO datosTablaDesplegableTitulaciones = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_TIIN,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             String tablaTitulaciones = datosTablaDesplegableTitulaciones.getTabla();
             String campoCodigoTitulaciones = datosTablaDesplegableTitulaciones.getCampoCodigo();
             String campoValorTitulaciones = datosTablaDesplegableTitulaciones.getCampoValor();
-            List<DesplegableExternoVO> listaTitulacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaTitulaciones, campoCodigoTitulaciones, campoValorTitulaciones, this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
-            if (listaTitulacion.size() > 0) {
-                request.setAttribute("listaTitulacion", listaTitulacion);
+            List<DesplegableExternoVO> listaTitulacion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesExternos(tablaTitulaciones, campoCodigoTitulaciones, campoValorTitulaciones,
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            log.info("cargarModificarContratacion - listaTitulacion cargada: "
+                    + (listaTitulacion != null ? listaTitulacion.size() : "null") + " elementos");
+            if (listaTitulacion == null || listaTitulacion.size() == 0) {
+                log.warn("cargarModificarContratacion - listaTitulacion est� vac�a o null, inicializando lista vac�a");
+                listaTitulacion = new ArrayList<DesplegableExternoVO>();
             }
-            DatosTablaDesplegableExtVO datosTablaDesplegableCProfesionales = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_CPIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            request.setAttribute("listaTitulacion", listaTitulacion);
+            DatosTablaDesplegableExtVO datosTablaDesplegableCProfesionales = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_CPIN,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             String tablaCProfesionales = datosTablaDesplegableCProfesionales.getTabla();
             String campoCodigoCProfesionales = datosTablaDesplegableCProfesionales.getCampoCodigo();
             String campoValorCProfesionales = datosTablaDesplegableCProfesionales.getCampoValor();
-            List<DesplegableExternoVO> listaCProfesionalidad = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaCProfesionales, campoCodigoCProfesionales, campoValorCProfesionales, this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
-            if (listaCProfesionalidad.size() > 0) {
-                request.setAttribute("listaCProfesionalidad", listaCProfesionalidad);
+            List<DesplegableExternoVO> listaCProfesionalidad = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesExternos(tablaCProfesionales, campoCodigoCProfesionales,
+                            campoValorCProfesionales, this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            log.info("cargarModificarContratacion - listaCProfesionalidad cargada: "
+                    + (listaCProfesionalidad != null ? listaCProfesionalidad.size() : "null") + " elementos");
+            if (listaCProfesionalidad == null || listaCProfesionalidad.size() == 0) {
+                log.warn(
+                        "cargarModificarContratacion - listaCProfesionalidad est� vac�a o null, inicializando lista vac�a");
+                listaCProfesionalidad = new ArrayList<DesplegableExternoVO>();
             }
+            request.setAttribute("listaCProfesionalidad", listaCProfesionalidad);
         } catch (Exception ex) {
-            log.debug("Error al tratar de preparar los datos para modificar y llamar la jsp de modificaci�n : " + ex.getMessage());
+            log.error("Error al tratar de preparar los datos para modificar y llamar la jsp de modificacion: "
+                    + ex.getMessage(), ex);
         }
         return urlnuevaContratacion;
 
     }
 
-    public void eliminarContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+    public void eliminarContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
         String codigoOperacion = "0";
         List<ContratacionVO> lista = new ArrayList<ContratacionVO>();
         String numExp = "";
         try {
             String id = (String) request.getParameter("id");
             if (id == null || id.equals("")) {
-                log.debug("No se ha recibido desde la JSP el id de la contrataci�n a elimnar ");
                 codigoOperacion = "3";
             } else {
                 numExp = request.getParameter("numExp").toString();
@@ -302,12 +581,13 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                     try {
                         lista = MeLanbide11Manager.getInstance().getDatosContratacion(numExp, codOrganizacion, adapt);
                     } catch (Exception ex) {
-                        log.debug("Error al recuperar la lista de contrataci�n despu�s de eliminar una contrataci�n");
+                        log.error("Error al recuperar la lista de contrataci�n despu�s de eliminar una contrataci�n",
+                                ex);
                     }
                 }
             }
         } catch (Exception ex) {
-            log.debug("Error eliminando una contrataci�n: " + ex);
+            log.error("Error eliminando una contrataci�n: " + ex.getMessage(), ex);
             codigoOperacion = "2";
         }
         String xmlSalida = null;
@@ -315,19 +595,20 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         retornarXML(xmlSalida, response);
     }
 
-    public void crearNuevaContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+    public void crearNuevaContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
         String codigoOperacion = "0";
         List<ContratacionVO> lista = new ArrayList<ContratacionVO>();
         ContratacionVO nuevaContratacion = new ContratacionVO();
         try {
             AdaptadorSQLBD adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
-            
+
             String numExp = (String) request.getParameter("expediente");
-            
+
             String oferta = (String) request.getParameter("oferta");
             String idContrato1 = (String) request.getParameter("idContrato1");
             String idContrato2 = (String) request.getParameter("idContrato2");
-            
+
             String dni = (String) request.getParameter("dni");
             String nombre = (String) request.getParameter("nombre");
             String apellido1 = (String) request.getParameter("apellido1");
@@ -339,13 +620,14 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String finFormativa = (String) request.getParameter("finFormativa");
             String codFormativa = (String) request.getParameter("codFormativa");
             String denFormativa = (String) request.getParameter("denFormativa");
-            
+
             String puesto = (String) request.getParameter("puesto");
             String ocupacion = (String) request.getParameter("ocupacion");
             String desOcupacion = (String) request.getParameter("desOcupacion");
             String desOcupacionLibre = (String) request.getParameter("desOcupacionLibre");
+            String desTitulacionLibre = (String) request.getParameter("desTitulacionLibre");
             String titulacion = (String) request.getParameter("titulacion");
-            String titulacionRequerida = (String) request.getParameter("titulacionRequerida");
+
             String cProfesionalidad = (String) request.getParameter("cProfesionalidad");
             String modalidadContrato = (String) request.getParameter("modalidadContrato");
             String jornada = (String) request.getParameter("jornada");
@@ -359,17 +641,38 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String numSS = (String) request.getParameter("numSS");
             String costeContrato = (String) request.getParameter("costeContrato").replace(",", ".");
             String tipRetribucion = (String) request.getParameter("tipRetribucion");
-            
+
             String importeSub = (String) request.getParameter("importeSub").replace(",", ".");
-            
+
+            // === NUEVOS CAMPOS ===
+            String titReqPuesto = (String) request.getParameter("titReqPuesto");
+            String funciones = (String) request.getParameter("funciones");
+
+            // === NUEVOS CAMPOS RSB ===
+            String rsbSalBase = (String) request.getParameter("rsbSalBase");
+            if (rsbSalBase != null)
+                rsbSalBase = rsbSalBase.replace(",", ".");
+
+            String rsbPagExtra = (String) request.getParameter("rsbPagExtra");
+            if (rsbPagExtra != null)
+                rsbPagExtra = rsbPagExtra.replace(",", ".");
+
+            String rsbImporte = (String) request.getParameter("rsbImporte");
+            if (rsbImporte != null)
+                rsbImporte = rsbImporte.replace(",", ".");
+
+            String rsbCompConv = (String) request.getParameter("rsbCompConv"); // Este contiene el TOTAL calculado
+            if (rsbCompConv != null)
+                rsbCompConv = rsbCompConv.replace(",", ".");
+
             SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-            
+
             nuevaContratacion.setNumExp(numExp);
-            
+
             nuevaContratacion.setOferta(oferta);
             nuevaContratacion.setIdContrato1(idContrato1);
             nuevaContratacion.setIdContrato2(idContrato2);
-            
+
             nuevaContratacion.setDni(dni);
             nuevaContratacion.setNombre(nombre);
             nuevaContratacion.setApellido1(apellido1);
@@ -385,13 +688,28 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             nuevaContratacion.setFinFormativa(finFormativa);
             nuevaContratacion.setCodFormativa(codFormativa);
             nuevaContratacion.setDenFormativa(denFormativa);
-            
+
             nuevaContratacion.setPuesto(puesto);
             nuevaContratacion.setOcupacion(ocupacion);
             nuevaContratacion.setDesOcupacion(desOcupacion);
             nuevaContratacion.setDesOcupacionLibre(desOcupacionLibre);
-            nuevaContratacion.setTitulacion(titulacion);
-            nuevaContratacion.setTitulacionRequerida(titulacionRequerida);
+
+            // Mejorar manejo de campos de titulaci�n para nueva contrataci�n
+
+            // Si desTitulacionLibre viene vac�o, establecer como null
+            if (desTitulacionLibre != null && !desTitulacionLibre.trim().equals("")) {
+                nuevaContratacion.setDesTitulacionLibre(desTitulacionLibre.trim());
+            } else {
+                nuevaContratacion.setDesTitulacionLibre(null);
+            }
+
+            // Si titulacion viene vac�o, establecer como null
+            if (titulacion != null && !titulacion.trim().equals("")) {
+                nuevaContratacion.setTitulacion(titulacion.trim());
+            } else {
+                nuevaContratacion.setTitulacion(null);
+            }
+
             nuevaContratacion.setcProfesionalidad(cProfesionalidad);
             nuevaContratacion.setModalidadContrato(modalidadContrato);
             nuevaContratacion.setJornada(jornada);
@@ -415,24 +733,51 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 nuevaContratacion.setCosteContrato(Double.parseDouble(costeContrato));
             }
             nuevaContratacion.setTipRetribucion(tipRetribucion);
-            
+
             if (importeSub != null && !"".equals(importeSub)) {
                 nuevaContratacion.setImporteSub(Double.parseDouble(importeSub));
             }
-            
-            
+
+            // === SETEAR NUEVOS CAMPOS ===
+            nuevaContratacion.setTitReqPuesto(titReqPuesto);
+            nuevaContratacion.setFunciones(funciones);
+
+            // === SETEAR CAMPOS RSB INDIVIDUALES ===
+
+            if (rsbSalBase != null && !"".equals(rsbSalBase)) {
+                nuevaContratacion.setRsbSalBase(Double.parseDouble(rsbSalBase));
+            }
+
+            if (rsbPagExtra != null && !"".equals(rsbPagExtra)) {
+                nuevaContratacion.setRsbPagExtra(Double.parseDouble(rsbPagExtra));
+            }
+
+            if (rsbImporte != null && !"".equals(rsbImporte)) {
+                nuevaContratacion.setRsbImporte(Double.parseDouble(rsbImporte));
+            }
+
+            // rsbCompConv ahora contiene el TOTAL calculado que se debe guardar en la BD
+            if (rsbCompConv != null && !"".equals(rsbCompConv)) {
+                nuevaContratacion.setRsbCompConv(Double.parseDouble(rsbCompConv));
+
+                // Verificar que coincida con el c�lculo interno
+                Double totalCalculado = nuevaContratacion.getRsbComputableTotal();
+                if (totalCalculado != null && Math.abs(Double.parseDouble(rsbCompConv) - totalCalculado) > 0.01) {
+                    log.warn("ADVERTENCIA: Discrepancia entre total enviado (" + rsbCompConv + ") y total calculado ("
+                            + totalCalculado + ")");
+                }
+            }
+
             MeLanbide11Manager meLanbide11Manager = MeLanbide11Manager.getInstance();
             boolean insertOK = meLanbide11Manager.crearNuevaContratacion(nuevaContratacion, adapt);
             if (insertOK) {
-                log.debug("Contrataci�n insertada correctamente");
                 lista = meLanbide11Manager.getDatosContratacion(numExp, codOrganizacion, adapt);
-
             } else {
-                log.debug("No se ha insertado correctamente la nueva contrataci�n");
                 codigoOperacion = "1";
             }
         } catch (Exception ex) {
-            log.debug("Error al parsear los parametros recibidos del jsp al objeto ContratacionVO" + ex.getMessage());
+            log.error("Error al parsear los parametros recibidos del jsp al objeto ContratacionVO: " + ex.getMessage(),
+                    ex);
             codigoOperacion = "2";
         }
 
@@ -441,21 +786,22 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         retornarXML(xmlSalida, response);
     }
 
-    public void modificarContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+    public void modificarContratacion(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
         String codigoOperacion = "0";
         List<ContratacionVO> lista = new ArrayList<ContratacionVO>();
 
         try {
             AdaptadorSQLBD adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
-            //Recojo los parametros
+            // Recojo los parametros
             String id = (String) request.getParameter("id");
-            
+
             String numExp = (String) request.getParameter("expediente");
-            
+
             String oferta = (String) request.getParameter("oferta");
             String idContrato1 = (String) request.getParameter("idContrato1");
             String idContrato2 = (String) request.getParameter("idContrato2");
-            
+
             String dni = (String) request.getParameter("dni");
             String nombre = (String) request.getParameter("nombre");
             String apellido1 = (String) request.getParameter("apellido1");
@@ -467,42 +813,72 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String finFormativa = (String) request.getParameter("finFormativa");
             String codFormativa = (String) request.getParameter("codFormativa");
             String denFormativa = (String) request.getParameter("denFormativa");
-            
+
             String puesto = (String) request.getParameter("puesto");
             String ocupacion = (String) request.getParameter("ocupacion");
             String desOcupacion = (String) request.getParameter("desOcupacion");
             String desOcupacionLibre = (String) request.getParameter("desOcupacionLibre");
+            String desTitulacionLibre = (String) request.getParameter("desTitulacionLibre");
             String titulacion = (String) request.getParameter("titulacion");
-            String titulacionRequerida = (String) request.getParameter("titulacionRequerida");
+
             String cProfesionalidad = (String) request.getParameter("cProfesionalidad");
             String modalidadContrato = (String) request.getParameter("modalidadContrato");
             String jornada = (String) request.getParameter("jornada");
             String porcJornada = (String) request.getParameter("porcJornada").replace(",", ".");
             String horasConv = (String) request.getParameter("horasConv");
             String fechaInicio = (String) request.getParameter("fechaInicio");
-            //log.debug("++++++++fechaInicio: " + fechaInicio);
             String fechaFin = (String) request.getParameter("fechaFin");
-            //log.debug("++++++++fechaFin: " + fechaFin);
             String mesesContrato = (String) request.getParameter("mesesContrato");
             String grupoCotizacion = (String) request.getParameter("grupoCotizacion");
             String direccionCT = (String) request.getParameter("direccionCT");
             String numSS = (String) request.getParameter("numSS");
             String costeContrato = (String) request.getParameter("costeContrato").replace(",", ".");
             String tipRetribucion = (String) request.getParameter("tipRetribucion");
-            
+
             String importeSub = (String) request.getParameter("importeSub").replace(",", ".");
 
+            // === NUEVOS CAMPOS ===
+            String titReqPuesto = (String) request.getParameter("titReqPuesto");
+            String funciones = (String) request.getParameter("funciones");
+
+            // === NUEVOS CAMPOS RSB ===
+            String rsbSalBase = (String) request.getParameter("rsbSalBase");
+            if (rsbSalBase != null)
+                rsbSalBase = rsbSalBase.replace(",", ".");
+
+            String rsbPagExtra = (String) request.getParameter("rsbPagExtra");
+            if (rsbPagExtra != null)
+                rsbPagExtra = rsbPagExtra.replace(",", ".");
+
+            String rsbImporte = (String) request.getParameter("rsbImporte");
+            if (rsbImporte != null)
+                rsbImporte = rsbImporte.replace(",", ".");
+
+            String rsbCompConv = (String) request.getParameter("rsbCompConv"); // Este contiene el TOTAL calculado
+            if (rsbCompConv != null)
+                rsbCompConv = rsbCompConv.replace(",", ".");
+
             if (id == null || id.equals("")) {
-                log.debug("No se ha recibido desde la JSP el id de la contrataci�n a modificar ");
                 codigoOperacion = "3";
             } else {
+                log.info("========== INICIO OPERACION MODIFICAR CONTRATACION ==========");
+                log.info("TIMESTAMP: " + new java.util.Date());
+                log.info("PARAMETROS RECIBIDOS:");
+                log.info("- id: " + id);
+                log.info("- dni: " + dni);
+                log.info("- nombre: " + nombre);
+                log.info("- rsbCompConv (TOTAL): " + rsbCompConv);
+                log.info("- titulacion: " + titulacion);
+                log.info("- desTitulacionLibre: " + desTitulacionLibre);
+                log.info("===============================================================");
+
                 ContratacionVO datModif = MeLanbide11Manager.getInstance().getContratacionPorID(id, adapt);
+
                 numExp = datModif.getNumExp();
                 datModif.setId(Integer.parseInt(id));
 
                 SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-                
-                
+
                 datModif.setNumExp(numExp);
 
                 datModif.setOferta(oferta);
@@ -530,8 +906,28 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 datModif.setOcupacion(ocupacion);
                 datModif.setDesOcupacion(desOcupacion);
                 datModif.setDesOcupacionLibre(desOcupacionLibre);
-                datModif.setTitulacion(titulacion);
-                datModif.setTitulacionRequerida(titulacionRequerida);
+
+                // Mejorar manejo de campos de titulaci�n
+                log.info("*** FLUJO RSB - PASO 2: SETEANDO CAMPOS DE TITULACION ***");
+
+                // Si desTitulacionLibre viene vac�o, mantener el valor original o null
+                if (desTitulacionLibre != null && !desTitulacionLibre.trim().equals("")) {
+                    datModif.setDesTitulacionLibre(desTitulacionLibre.trim());
+                } else {
+                    datModif.setDesTitulacionLibre(null);
+                }
+
+                // Si titulacion viene vac�o, mantener el valor original o null
+                if (titulacion != null && !titulacion.trim().equals("")) {
+                    datModif.setTitulacion(titulacion.trim());
+                } else {
+                    datModif.setTitulacion(null);
+                }
+
+                // *** DATOS RSB COMPLETADOS ***
+                log.info("Los datos RSB han sido procesados correctamente en la secci�n anterior.");
+                log.info("*** FIN PASO 2 ***");
+
                 datModif.setcProfesionalidad(cProfesionalidad);
                 datModif.setModalidadContrato(modalidadContrato);
                 datModif.setJornada(jornada);
@@ -546,7 +942,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 if (fechaInicio != null && !"".equals(fechaInicio)) {
                     datModif.setFechaInicio(new java.sql.Date(formatoFecha.parse(fechaInicio).getTime()));
                 }
-                 datModif.setFechaFin(null);
+                datModif.setFechaFin(null);
                 if (fechaFin != null && !"".equals(fechaFin)) {
                     datModif.setFechaFin(new java.sql.Date(formatoFecha.parse(fechaFin).getTime()));
                 }
@@ -559,24 +955,118 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                     datModif.setCosteContrato(Double.parseDouble(costeContrato));
                 }
                 datModif.setTipRetribucion(tipRetribucion);
-                
+
+                log.info("*** FLUJO RSB - PASO 1.5: ASIGNACION IMPSUBVCONT ***");
+                log.info("Par�metro importeSub recibido: '" + importeSub + "'");
+                log.info("IMPSUBVCONT ORIGINAL en datModif: "
+                        + (datModif.getImporteSub() != null ? datModif.getImporteSub() : "NULL"));
+
                 datModif.setImporteSub(null);
                 if (importeSub != null && !"".equals(importeSub)) {
-                    datModif.setImporteSub(Double.parseDouble(importeSub));
+                    Double importeSubParsed = Double.parseDouble(importeSub);
+                    datModif.setImporteSub(importeSubParsed);
+                    log.info("IMPSUBVCONT ASIGNADO: " + importeSubParsed);
+                } else {
+                    log.info("IMPSUBVCONT ASIGNADO: NULL (par�metro vac�o o null)");
                 }
-            
+
+                log.info("IMPSUBVCONT FINAL en datModif: "
+                        + (datModif.getImporteSub() != null ? datModif.getImporteSub() : "NULL"));
+                log.info("*** FIN PASO 1.5 ***");
+
+                // === SETEAR NUEVOS CAMPOS ===
+                datModif.setTitReqPuesto(titReqPuesto);
+                datModif.setFunciones(funciones);
+
+                // === SETEAR CAMPOS RSB INDIVIDUALES ===
+
+                if (rsbSalBase != null && !"".equals(rsbSalBase)) {
+                    datModif.setRsbSalBase(Double.parseDouble(rsbSalBase));
+                } else {
+                    datModif.setRsbSalBase(null);
+                }
+
+                if (rsbPagExtra != null && !"".equals(rsbPagExtra)) {
+                    datModif.setRsbPagExtra(Double.parseDouble(rsbPagExtra));
+                } else {
+                    datModif.setRsbPagExtra(null);
+                }
+
+                if (rsbImporte != null && !"".equals(rsbImporte)) {
+                    datModif.setRsbImporte(Double.parseDouble(rsbImporte));
+                } else {
+                    datModif.setRsbImporte(null);
+                }
+
+                // rsbCompConv ahora contiene el TOTAL calculado que se debe guardar en la BD
+                if (rsbCompConv != null && !"".equals(rsbCompConv)) {
+                    datModif.setRsbCompConv(Double.parseDouble(rsbCompConv));
+
+                    // Verificar que coincida con el c�lculo interno
+                    Double totalCalculado = datModif.getRsbComputableTotal();
+                    if (totalCalculado != null && Math.abs(Double.parseDouble(rsbCompConv) - totalCalculado) > 0.01) {
+                        log.warn("ADVERTENCIA: Discrepancia entre total enviado (" + rsbCompConv
+                                + ") y total calculado (" + totalCalculado + ")");
+                    }
+                } else {
+                    datModif.setRsbCompConv(null);
+                }
+
+                log.info("*** VERIFICACION IMPSUBVCONT DESPUES DE RSB ***");
+                log.info("datModif.getImporteSub(): "
+                        + (datModif.getImporteSub() != null ? datModif.getImporteSub() : "NULL"));
+                log.info("datModif.getRsbComputableTotal(): "
+                        + (datModif.getRsbComputableTotal() != null ? datModif.getRsbComputableTotal() : "NULL"));
+                log.info("�SON IGUALES ImporteSub y RsbTotal?: "
+                        + (datModif.getImporteSub() != null && datModif.getRsbComputableTotal() != null
+                                ? datModif.getImporteSub().equals(datModif.getRsbComputableTotal())
+                                : "ALGUNO ES NULL"));
+                log.info("*** FIN VERIFICACION ***");
+
+                // *** FLUJO RSB - PASO 3: ANTES DE LLAMAR AL MANAGER ***
+                log.info("*** FLUJO RSB - PASO 3: ANTES DE PERSISTIR EN BD ***");
+
+                log.info("*** VERIFICACION FINAL ANTES DE PERSISTIR ***");
+                log.info("ImporteSub FINAL: " + (datModif.getImporteSub() != null ? datModif.getImporteSub() : "NULL"));
+                log.info("RsbComputableTotal FINAL: "
+                        + (datModif.getRsbComputableTotal() != null ? datModif.getRsbComputableTotal() : "NULL"));
+                log.info("*** FIN VERIFICACION FINAL ***");
+
+                log.info("*** FIN PASO 3 ***");
 
                 MeLanbide11Manager meLanbide11Manager = MeLanbide11Manager.getInstance();
                 boolean modOK = meLanbide11Manager.modificarContratacion(datModif, adapt);
+
+                // *** FLUJO RSB - PASO 4: DESPUES DE PERSISTIR ***
+                log.info("*** FLUJO RSB - PASO 4: DESPUES DE PERSISTIR EN BD ***");
+                if (!modOK) {
+                    log.error("ERROR: La modificaci�n en BD fall�!");
+                }
+                log.info("*** FIN PASO 4 ***");
+
                 if (modOK) {
                     try {
+                        // *** FLUJO RSB - PASO 5: ANTES DE RECUPERAR LISTA ***
+                        log.info("*** FLUJO RSB - PASO 5: ANTES DE RECUPERAR LISTA ACTUALIZADA ***");
                         lista = meLanbide11Manager.getDatosContratacion(numExp, codOrganizacion, adapt);
+
+                        // *** FLUJO RSB - PASO 6: DESPUES DE RECUPERAR LISTA ***
+                        log.info("*** FLUJO RSB - PASO 6: LISTA RECUPERADA DE BD ***");
+                        if (lista != null && !lista.isEmpty()) {
+                            for (ContratacionVO item : lista) {
+                                if (item.getId().toString().equals(id)) {
+                                    log.info("=== CONTRATACION ENCONTRADA PARA XML ===");
+                                    break;
+                                }
+                            }
+                        } else {
+                            log.error("ERROR: Lista recuperada est� vac�a o es NULL!");
+                        }
+                        log.info("*** FIN PASO 6 ***");
                     } catch (BDException bde) {
                         codigoOperacion = "1";
-                        log.debug("Error de tipo BD al recuperar la lista de contrataciones despu�s de modificar una contrataci�n : " + bde.getMensaje());
                     } catch (Exception ex) {
                         codigoOperacion = "2";
-                        log.debug("Error al recuperar la lista de contrataciones despu�s de modificar una contrataci�n : " + ex.getMessage());
                     }
                 } else {
                     codigoOperacion = "2";
@@ -584,17 +1074,40 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             }
 
         } catch (Exception ex) {
-            log.debug("Error modificar --- ", ex);
             codigoOperacion = "2";
         }
 
+        // *** FLUJO RSB - PASO 7: ANTES DE CONSTRUIR XML ***
+        log.info("*** FLUJO RSB - PASO 7: ANTES DE CONSTRUIR XML DE RESPUESTA ***");
+        if (lista != null && !lista.isEmpty()) {
+            // Lista cargada correctamente
+        } else {
+            // Lista vac�a o null
+        }
+        log.info("*** FIN PASO 7 ***");
+
         String xmlSalida = null;
         xmlSalida = obtenerXmlSalidaContratacion(request, codigoOperacion, lista);
+
+        // *** FLUJO RSB - PASO 8: XML CONSTRUIDO ***
+        log.info("*** FLUJO RSB - PASO 8: XML DE RESPUESTA CONSTRUIDO ***");
+        if (xmlSalida != null && xmlSalida.contains("RSBCOMPUTABLE")) {
+            // XML contiene campos RSBCOMPUTABLE
+        } else {
+            // XML no contiene campos RSBCOMPUTABLE o es NULL
+        }
+        log.info("*** FIN PASO 8 ***");
+
+        log.info("========== FIN OPERACION MODIFICAR CONTRATACION ==========");
+        log.info("RESULTADO FINAL - C�digo: " + codigoOperacion);
+        log.info("==============================================================");
+
         retornarXML(xmlSalida, response);
 
     }
-    
-    public String cargarNuevaMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+
+    public String cargarNuevaMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
         String nuevo = "1";
         String numExp = "";
         String urlnuevaMinimis = "/jsp/extension/melanbide11/nuevoMinimis.jsp?codOrganizacion=" + codOrganizacion;
@@ -610,20 +1123,25 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 numExp = request.getParameter("numExp").toString();
                 request.setAttribute("numExp", numExp);
             }
-            //Cargamos en el request los valores de los desplegables
-            List<DesplegableAdmonLocalVO> listaEstado = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTSV, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            // Cargamos en el request los valores de los desplegables
+            List<DesplegableAdmonLocalVO> listaEstado = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTSV,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             if (listaEstado.size() > 0) {
                 listaEstado = traducirDesplegable(request, listaEstado);
                 request.setAttribute("listaEstado", listaEstado);
             }
-       
+
         } catch (Exception ex) {
-            log.debug("Se ha presentado un error al intentar preparar la jsp de una nueva minimis : " + ex.getMessage());
+            // Error al preparar nueva minimis
         }
         return urlnuevaMinimis;
     }
 
-    public String cargarModificarMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+    public String cargarModificarMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
         String nuevo = "0";
         String urlnuevaMinimis = "/jsp/extension/melanbide11/nuevoMinimis.jsp?codOrganizacion=" + codOrganizacion;
         try {
@@ -637,32 +1155,37 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             String id = request.getParameter("id");
             // Recuperramos datos e Acceso a modificar y cargamos en el request
             if (id != null && !id.equals("")) {
-                MinimisVO datModif = MeLanbide11Manager.getInstance().getMinimisPorID(id, this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+                MinimisVO datModif = MeLanbide11Manager.getInstance().getMinimisPorID(id,
+                        this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
                 if (datModif != null) {
                     request.setAttribute("datModif", datModif);
                 }
             }
-            //Cargamos el el request los valores  de los desplegables
-            List<DesplegableAdmonLocalVO> listaEstado = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTSV, ConstantesMeLanbide11.FICHERO_PROPIEDADES), this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+            // Cargamos el el request los valores de los desplegables
+            List<DesplegableAdmonLocalVO> listaEstado = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTSV,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
             if (listaEstado.size() > 0) {
                 listaEstado = traducirDesplegable(request, listaEstado);
                 request.setAttribute("listaEstado", listaEstado);
             }
         } catch (Exception ex) {
-            log.debug("Error al tratar de preparar los datos para modificar y llamar la jsp de modificaci�n : " + ex.getMessage());
+            // Error al cargar modificar minimis
         }
         return urlnuevaMinimis;
 
     }
 
-    public void eliminarMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+    public void eliminarMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
         String codigoOperacion = "0";
         List<MinimisVO> lista = new ArrayList<MinimisVO>();
         String numExp = "";
         try {
             String id = (String) request.getParameter("id");
             if (id == null || id.equals("")) {
-                log.debug("No se ha recibido desde la JSP el id de la minimis a elimnar ");
                 codigoOperacion = "3";
             } else {
                 numExp = request.getParameter("numExp").toString();
@@ -675,12 +1198,10 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                     try {
                         lista = MeLanbide11Manager.getInstance().getDatosMinimis(numExp, codOrganizacion, adapt);
                     } catch (Exception ex) {
-                        log.debug("Error al recuperar la lista de minimis despu�s de eliminar una minimis");
                     }
                 }
             }
         } catch (Exception ex) {
-            log.debug("Error eliminando una minimis: " + ex);
             codigoOperacion = "2";
         }
         String xmlSalida = null;
@@ -688,25 +1209,26 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         retornarXML(xmlSalida, response);
     }
 
-    public void crearNuevaMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+    public void crearNuevaMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
         String codigoOperacion = "0";
         List<MinimisVO> lista = new ArrayList<MinimisVO>();
         MinimisVO nuevaMinimis = new MinimisVO();
         try {
             AdaptadorSQLBD adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
-            
+
             String numExp = (String) request.getParameter("expediente");
-            
+
             String estado = (String) request.getParameter("estado");
             String organismo = (String) request.getParameter("organismo");
             String objeto = (String) request.getParameter("objeto");
             String importe = (String) request.getParameter("importe").replace(",", ".");
             String fecha = (String) request.getParameter("fecha");
-            
+
             SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-            
+
             nuevaMinimis.setNumExp(numExp);
-            
+
             nuevaMinimis.setEstado(estado);
             nuevaMinimis.setOrganismo(organismo);
             nuevaMinimis.setObjeto(objeto);
@@ -716,19 +1238,16 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             if (fecha != null && !"".equals(fecha)) {
                 nuevaMinimis.setFecha(new java.sql.Date(formatoFecha.parse(fecha).getTime()));
             }
-            
+
             MeLanbide11Manager meLanbide11Manager = MeLanbide11Manager.getInstance();
             boolean insertOK = meLanbide11Manager.crearNuevaMinimis(nuevaMinimis, adapt);
             if (insertOK) {
-                log.debug("minimis insertada correctamente");
                 lista = meLanbide11Manager.getDatosMinimis(numExp, codOrganizacion, adapt);
 
             } else {
-                log.debug("No se ha insertado correctamente la nueva minimis");
                 codigoOperacion = "1";
             }
         } catch (Exception ex) {
-            log.debug("Error al parsear los parametros recibidos del jsp al objeto MinimisVO" + ex.getMessage());
             codigoOperacion = "2";
         }
 
@@ -737,25 +1256,25 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         retornarXML(xmlSalida, response);
     }
 
-    public void modificarMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+    public void modificarMinimis(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
         String codigoOperacion = "0";
         List<MinimisVO> lista = new ArrayList<MinimisVO>();
 
         try {
             AdaptadorSQLBD adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
-            //Recojo los parametros
+            // Recojo los parametros
             String id = (String) request.getParameter("id");
-            
+
             String numExp = (String) request.getParameter("expediente");
-            
+
             String estado = (String) request.getParameter("estado");
             String organismo = (String) request.getParameter("organismo");
             String objeto = (String) request.getParameter("objeto");
             String importe = (String) request.getParameter("importe").replace(",", ".");
             String fecha = (String) request.getParameter("fecha");
-       
+
             if (id == null || id.equals("")) {
-                log.debug("No se ha recibido desde la JSP el id de la minimis a modificar ");
                 codigoOperacion = "3";
             } else {
                 MinimisVO datModif = MeLanbide11Manager.getInstance().getMinimisPorID(id, adapt);
@@ -763,7 +1282,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 datModif.setId(Integer.parseInt(id));
 
                 SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
-                
+
                 datModif.setNumExp(numExp);
 
                 datModif.setEstado(estado);
@@ -775,7 +1294,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 if (fecha != null && !"".equals(fecha)) {
                     datModif.setFecha(new java.sql.Date(formatoFecha.parse(fecha).getTime()));
                 }
-           
+
                 MeLanbide11Manager meLanbide11Manager = MeLanbide11Manager.getInstance();
                 boolean modOK = meLanbide11Manager.modificarMinimis(datModif, adapt);
                 if (modOK) {
@@ -783,10 +1302,8 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                         lista = meLanbide11Manager.getDatosMinimis(numExp, codOrganizacion, adapt);
                     } catch (BDException bde) {
                         codigoOperacion = "1";
-                        log.debug("Error de tipo BD al recuperar la lista de minimis despu�s de modificar una minimis : " + bde.getMensaje());
                     } catch (Exception ex) {
                         codigoOperacion = "2";
-                        log.debug("Error al recuperar la lista de minimis despu�s de modificar una minimis : " + ex.getMessage());
                     }
                 } else {
                     codigoOperacion = "2";
@@ -794,7 +1311,6 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             }
 
         } catch (Exception ex) {
-            log.debug("Error modificar --- ", ex);
             codigoOperacion = "2";
         }
 
@@ -803,12 +1319,10 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         retornarXML(xmlSalida, response);
 
     }
-    
-    
+
     // Funciones Privadas
     private AdaptadorSQLBD getAdaptSQLBD(String codOrganizacion) throws SQLException {
         if (log.isDebugEnabled()) {
-            log.debug("getConnection ( codOrganizacion = " + codOrganizacion + " ) : BEGIN");
         }
         ResourceBundle config = ResourceBundle.getBundle("techserver");
         String gestor = config.getString("CON.gestor");
@@ -820,11 +1334,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         Connection con = null;
 
         if (log.isDebugEnabled()) {
-            log.debug("getJndi =========> ");
-            log.debug("parametro codOrganizacion: " + codOrganizacion);
-            log.debug("gestor: " + gestor);
-            log.debug("jndi: " + jndiGenerico);
-        }//if(log.isDebugEnabled())
+        } // if(log.isDebugEnabled())
 
         DataSource ds = null;
         AdaptadorSQLBD adapt = null;
@@ -832,19 +1342,19 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             try {
                 PortableContext pc = PortableContext.getInstance();
                 if (log.isDebugEnabled()) {
-                    log.debug("He cogido el jndi: " + jndiGenerico);
                 }
                 ds = (DataSource) pc.lookup(jndiGenerico, DataSource.class);
                 // Conexi�n al esquema gen�rico
                 conGenerico = ds.getConnection();
 
-                String sql = "SELECT EEA_BDE FROM A_EEA WHERE EEA_APL=" + ConstantesDatos.APP_GESTION_EXPEDIENTES + " AND AAE_ORG=" + codOrganizacion;
+                String sql = "SELECT EEA_BDE FROM A_EEA WHERE EEA_APL=" + ConstantesDatos.APP_GESTION_EXPEDIENTES
+                        + " AND AAE_ORG=" + codOrganizacion;
                 st = conGenerico.createStatement();
                 rs = st.executeQuery(sql);
                 String jndi = null;
                 while (rs.next()) {
                     jndi = rs.getString("EEA_BDE");
-                }//while(rs.next())
+                } // while(rs.next())
 
                 st.close();
                 rs.close();
@@ -860,7 +1370,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                     salida[5] = "";
                     salida[6] = jndi;
                     adapt = new AdaptadorSQLBD(salida);
-                }//if(jndi!=null && gestor!=null && !"".equals(jndi) && !"".equals(gestor))
+                } // if(jndi!=null && gestor!=null && !"".equals(jndi) && !"".equals(gestor))
             } catch (TechnicalException te) {
                 te.printStackTrace();
                 log.error("*** AdaptadorSQLBD: " + te.toString());
@@ -876,24 +1386,25 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
                 if (conGenerico != null && !conGenerico.isClosed()) {
                     conGenerico.close();
                 }
-            }// finally
+            } // finally
             if (log.isDebugEnabled()) {
-                log.debug("getConnection() : END");
             }
-        }// synchronized
+        } // synchronized
         return adapt;
-    }//getConnection
-    
-    
+    }// getConnection
+
     private String getDescripcionDesplegable(HttpServletRequest request, String descripcionCompleta) {
         String descripcion = descripcionCompleta;
-        
-        String barraSeparadoraDobleIdiomaDesple = ConfigurationParameter.getParameter(ConstantesMeLanbide11.BARRA_SEPARADORA_IDIOMA_DESPLEGABLES, ConstantesMeLanbide11.FICHERO_PROPIEDADES);
-        
+
+        String barraSeparadoraDobleIdiomaDesple = ConfigurationParameter.getParameter(
+                ConstantesMeLanbide11.BARRA_SEPARADORA_IDIOMA_DESPLEGABLES, ConstantesMeLanbide11.FICHERO_PROPIEDADES);
+
         try {
             if (!descripcion.isEmpty()) {
 
-                String[] descripcionDobleIdioma = (descripcion != null ? descripcion.split(barraSeparadoraDobleIdiomaDesple) : null);
+                String[] descripcionDobleIdioma = (descripcion != null
+                        ? descripcion.split(barraSeparadoraDobleIdiomaDesple)
+                        : null);
                 if (descripcionDobleIdioma != null && descripcionDobleIdioma.length > 1) {
                     if (getIdioma(request) == ConstantesMeLanbide11.CODIGO_IDIOMA_EUSKERA) {
                         descripcion = descripcionDobleIdioma[1];
@@ -910,13 +1421,13 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         } catch (Exception e) {
             return descripcion;
         }
-        
+
     }
 
     private int getIdioma(HttpServletRequest request) {
         // Recuperamos el Idioma de la request para la gestion de Desplegables
         UsuarioValueObject usuario = new UsuarioValueObject();
-        int idioma = ConstantesMeLanbide11.CODIGO_IDIOMA_CASTELLANO;  // Por Defecto 1 Castellano
+        int idioma = ConstantesMeLanbide11.CODIGO_IDIOMA_CASTELLANO; // Por Defecto 1 Castellano
         try {
 
             if (request != null && request.getSession() != null) {
@@ -932,7 +1443,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
 
         return idioma;
     }
-    
+
     private String bytesToHex(byte[] bytes) {
         char[] hexArray = "0123456789ABCDEF".toCharArray();
 
@@ -945,88 +1456,39 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
         }
         return new String(hexChars);
     }
-    
+
     // ----------------------------------------------------------------------------------------------------------
-    // ---------------    XML    --------------------------------------------------------------------------------
+    // --------------- XML
+    // --------------------------------------------------------------------------------
     // ----------------------------------------------------------------------------------------------------------
     private void retornarXML(String salida, HttpServletResponse response) {
         try {
-            if (salida != null && !salida.isEmpty()) {
-                // Ensure proper response headers to avoid chunked encoding issues
+            if (salida != null) {
                 response.setContentType("text/xml");
                 response.setCharacterEncoding("UTF-8");
-                
-                // Calculate content length in bytes to avoid chunked encoding
-                byte[] responseData = salida.getBytes("UTF-8");
-                response.setContentLength(responseData.length);
-                
-                // Prevent caching
-                response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-                response.setHeader("Pragma", "no-cache");
-                response.setDateHeader("Expires", 0);
-                
                 PrintWriter out = response.getWriter();
                 out.print(salida);
                 out.flush();
                 out.close();
-            } else {
-                // Return a proper error XML response when salida is null or empty
-                String errorXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RESPUESTA><CODIGO_OPERACION>2</CODIGO_OPERACION></RESPUESTA>";
-                response.setContentType("text/xml");
-                response.setCharacterEncoding("UTF-8");
-                
-                byte[] responseData = errorXML.getBytes("UTF-8");
-                response.setContentLength(responseData.length);
-                
-                response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-                response.setHeader("Pragma", "no-cache");
-                response.setDateHeader("Expires", 0);
-                
-                PrintWriter out = response.getWriter();
-                out.print(errorXML);
-                out.flush();
-                out.close();
             }
         } catch (Exception e) {
-            log.error("Error returning XML response", e);
-            try {
-                // Ensure we always return some response even on error
-                if (!response.isCommitted()) {
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    String errorXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RESPUESTA><CODIGO_OPERACION>2</CODIGO_OPERACION></RESPUESTA>";
-                    response.setContentType("text/xml");
-                    response.setCharacterEncoding("UTF-8");
-                    
-                    byte[] responseData = errorXML.getBytes("UTF-8");
-                    response.setContentLength(responseData.length);
-                    
-                    PrintWriter out = response.getWriter();
-                    out.print(errorXML);
-                    out.flush();
-                    out.close();
-                }
-            } catch (Exception ex) {
-                log.error("Failed to send error response", ex);
-            }
+            e.printStackTrace();
         }
     }
-    
-    private String obtenerXmlSalidaContratacion(HttpServletRequest request, String codigoOperacion, List<ContratacionVO> lista) {
+
+    private String obtenerXmlSalidaContratacion(HttpServletRequest request, String codigoOperacion,
+            List<ContratacionVO> lista) {
         StringBuffer xmlSalida = new StringBuffer();
-        try {
-            xmlSalida.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            xmlSalida.append("<RESPUESTA>");
-            xmlSalida.append("<CODIGO_OPERACION>");
-            xmlSalida.append(codigoOperacion != null ? codigoOperacion : "2");
-            xmlSalida.append("</CODIGO_OPERACION>");
-            
-            if (lista != null) {
+        xmlSalida.append("<RESPUESTA>");
+        xmlSalida.append("<CODIGO_OPERACION>");
+        xmlSalida.append(codigoOperacion);
+        xmlSalida.append("</CODIGO_OPERACION>");
         for (ContratacionVO fila : lista) {
             xmlSalida.append("<FILA>");
             xmlSalida.append("<ID>");
             xmlSalida.append(fila.getId() != null ? fila.getId().toString() : "");
             xmlSalida.append("</ID>");
-            
+
             xmlSalida.append("<NOFECONT>");
             xmlSalida.append(fila.getOferta());
             xmlSalida.append("</NOFECONT>");
@@ -1036,7 +1498,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             xmlSalida.append("<IDCONT2>");
             xmlSalida.append(fila.getIdContrato2());
             xmlSalida.append("</IDCONT2>");
-            
+
             xmlSalida.append("<DNICONT>");
             xmlSalida.append(fila.getDni());
             xmlSalida.append("</DNICONT>");
@@ -1050,7 +1512,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             xmlSalida.append(fila.getApellido2());
             xmlSalida.append("</APE2CONT>");
             xmlSalida.append("<FECHNACCONT>");
-            if (fila.getFechaNacimiento()!= null) {
+            if (fila.getFechaNacimiento() != null) {
                 xmlSalida.append(dateFormat.format(fila.getFechaNacimiento()));
             } else {
                 xmlSalida.append("");
@@ -1067,10 +1529,10 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             xmlSalida.append(getDescripcionDesplegable(request, fila.getDesSexo()));
             xmlSalida.append("</SEXOCONT>");
             xmlSalida.append("<MAY55CONT>");
-            xmlSalida.append(fila.getMayor55());
+            xmlSalida.append(getDescripcionDesplegable(request, fila.getDesMayor55()));
             xmlSalida.append("</MAY55CONT>");
             xmlSalida.append("<ACCFORCONT>");
-            xmlSalida.append(fila.getFinFormativa());
+            xmlSalida.append(getDescripcionDesplegable(request, fila.getFinFormativa()));
             xmlSalida.append("</ACCFORCONT>");
             xmlSalida.append("<CODFORCONT>");
             xmlSalida.append(fila.getCodFormativa());
@@ -1078,7 +1540,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             xmlSalida.append("<DENFORCONT>");
             xmlSalida.append(fila.getDenFormativa());
             xmlSalida.append("</DENFORCONT>");
-            
+
             xmlSalida.append("<PUESTOCONT>");
             xmlSalida.append(fila.getPuesto());
             xmlSalida.append("</PUESTOCONT>");
@@ -1086,18 +1548,12 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             xmlSalida.append(fila.getOcupacion());
             xmlSalida.append("</CODOCUCONT>");
             xmlSalida.append("<OCUCONT>");
-            if (fila.getDesOcupacionLibre()!= null && !"".equals(fila.getDesOcupacionLibre())) {
+            if (fila.getDesOcupacionLibre() != null && !"".equals(fila.getDesOcupacionLibre())) {
                 xmlSalida.append(fila.getDesOcupacionLibre());
             } else {
                 xmlSalida.append(fila.getDesOcupacion());
             }
             xmlSalida.append("</OCUCONT>");
-            xmlSalida.append("<DESTITULACION>");
-            xmlSalida.append(fila.getDesTitulacionLibre());
-            xmlSalida.append("</DESTITULACION>");
-            xmlSalida.append("<TITULACION>");
-            xmlSalida.append(fila.getDesTitulacion());
-            xmlSalida.append("</TITULACION>");
             xmlSalida.append("<CPROFESIONALIDAD>");
             xmlSalida.append(fila.getDesCProfesionalidad());
             xmlSalida.append("</CPROFESIONALIDAD>");
@@ -1108,7 +1564,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             xmlSalida.append(getDescripcionDesplegable(request, fila.getDesJornada()));
             xmlSalida.append("</JORCONT>");
             xmlSalida.append("<PORCJOR>");
-            if (fila.getPorcJornada()!= null && !"".equals(fila.getPorcJornada())) {
+            if (fila.getPorcJornada() != null && !"".equals(fila.getPorcJornada())) {
                 xmlSalida.append(fila.getPorcJornada());
             } else {
                 xmlSalida.append("null");
@@ -1122,21 +1578,21 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             }
             xmlSalida.append("</HORASCONV>");
             xmlSalida.append("<FECHINICONT>");
-            if (fila.getFechaInicio()!= null) {
+            if (fila.getFechaInicio() != null) {
                 xmlSalida.append(dateFormat.format(fila.getFechaInicio()));
             } else {
                 xmlSalida.append("");
             }
             xmlSalida.append("</FECHINICONT>");
             xmlSalida.append("<FECHFINCONT>");
-            if (fila.getFechaFin()!= null) {
+            if (fila.getFechaFin() != null) {
                 xmlSalida.append(dateFormat.format(fila.getFechaFin()));
             } else {
                 xmlSalida.append("");
             }
             xmlSalida.append("</FECHFINCONT>");
             xmlSalida.append("<DURCONT>");
-            if (fila.getMesesContrato()!= null && !"".equals(fila.getMesesContrato())) {
+            if (fila.getMesesContrato() != null && !"".equals(fila.getMesesContrato())) {
                 xmlSalida.append(fila.getMesesContrato());
             } else {
                 xmlSalida.append("-");
@@ -1152,7 +1608,7 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             xmlSalida.append(fila.getNumSS());
             xmlSalida.append("</NSSCONT>");
             xmlSalida.append("<CSTCONT>");
-            if (fila.getCosteContrato()!= null && !"".equals(fila.getCosteContrato())) {
+            if (fila.getCosteContrato() != null && !"".equals(fila.getCosteContrato())) {
                 xmlSalida.append(fila.getCosteContrato());
             } else {
                 xmlSalida.append("null");
@@ -1161,45 +1617,98 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             xmlSalida.append("<TIPRSB>");
             xmlSalida.append(getDescripcionDesplegable(request, fila.getDesTipRetribucion()));
             xmlSalida.append("</TIPRSB>");
-            
-            xmlSalida.append("<IMPSUBVCONT>");
-            if (fila.getImporteSub()!= null && !"".equals(fila.getImporteSub())) {
-                xmlSalida.append(fila.getImporteSub());
+
+            // A�adir campos RSB antes del importe de subvenci�n
+            xmlSalida.append("<RSBSALBASE>");
+            if (fila.getRsbSalBase() != null && !"".equals(fila.getRsbSalBase())) {
+                xmlSalida.append(fila.getRsbSalBase());
             } else {
                 xmlSalida.append("null");
             }
+            xmlSalida.append("</RSBSALBASE>");
+
+            xmlSalida.append("<RSBPAGEXTRA>");
+            if (fila.getRsbPagExtra() != null && !"".equals(fila.getRsbPagExtra())) {
+                xmlSalida.append(fila.getRsbPagExtra());
+            } else {
+                xmlSalida.append("null");
+            }
+            xmlSalida.append("</RSBPAGEXTRA>");
+
+            xmlSalida.append("<RSBCOMPCONV>");
+            if (fila.getRsbCompConv() != null && !"".equals(fila.getRsbCompConv())) {
+                xmlSalida.append(fila.getRsbCompConv());
+            } else {
+                xmlSalida.append("null");
+            }
+            xmlSalida.append("</RSBCOMPCONV>");
+
+            // Campo calculado - Retribuci�n salarial bruta computable total
+            xmlSalida.append("<RSBCOMPUTABLE>");
+            if (fila.getRsbComputableTotal() != null) {
+                xmlSalida.append(fila.getRsbComputableTotal());
+                log.info("*** XML RSB *** RSBCOMPUTABLE CALCULADO para ID " + fila.getId() + ": "
+                        + fila.getRsbComputableTotal());
+            } else {
+                xmlSalida.append("null");
+                log.warn("*** XML RSB *** RSBCOMPUTABLE es NULL para ID " + fila.getId());
+            }
+            xmlSalida.append("</RSBCOMPUTABLE>");
+
+            log.info("*** COMPARACION VALORES ANTES DE IMPSUBVCONT - ID " + fila.getId() + " ***");
+            log.info("- RSBCOMPUTABLE (RSB Total): "
+                    + (fila.getRsbComputableTotal() != null ? fila.getRsbComputableTotal() : "NULL"));
+            log.info("- IMPSUBVCONT (Importe Sub): " + (fila.getImporteSub() != null ? fila.getImporteSub() : "NULL"));
+            log.info("- SON IGUALES?: " + (fila.getRsbComputableTotal() != null && fila.getImporteSub() != null
+                    ? fila.getRsbComputableTotal().equals(fila.getImporteSub())
+                    : "ALGUNO ES NULL"));
+
+            xmlSalida.append("<IMPSUBVCONT>");
+            if (fila.getImporteSub() != null && !"".equals(fila.getImporteSub())) {
+                xmlSalida.append(fila.getImporteSub());
+                log.info("*** XML *** IMPSUBVCONT para ID " + fila.getId() + ": " + fila.getImporteSub()
+                        + " (ENVIADO AL XML)");
+            } else {
+                xmlSalida.append("null");
+                log.warn("*** XML *** IMPSUBVCONT para ID " + fila.getId() + ": NULL/VACIO - ENVIANDO 'null'");
+            }
             xmlSalida.append("</IMPSUBVCONT>");
-            
-            
+
+            // === CAMPOS DE TITULACION ===
+            xmlSalida.append("<DESTITULACION>");
+            if (fila.getDesTitulacionLibre() != null && !"".equals(fila.getDesTitulacionLibre())) {
+                xmlSalida.append(fila.getDesTitulacionLibre());
+            } else {
+                xmlSalida.append("null");
+            }
+            xmlSalida.append("</DESTITULACION>");
+
+            xmlSalida.append("<TITULACION>");
+            if (fila.getTitulacion() != null && !"".equals(fila.getTitulacion())) {
+                xmlSalida.append(fila.getTitulacion());
+            } else {
+                xmlSalida.append("null");
+            }
+            xmlSalida.append("</TITULACION>");
+
             xmlSalida.append("</FILA>");
         }
-        }
         xmlSalida.append("</RESPUESTA>");
-        log.debug("xml: " + xmlSalida);
         return xmlSalida.toString();
-        } catch (Exception e) {
-            log.error("Error generating XML response for contratacion", e);
-            // Return a basic error response if XML generation fails
-            return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RESPUESTA><CODIGO_OPERACION>2</CODIGO_OPERACION></RESPUESTA>";
-        }
     }
-    
+
     private String obtenerXmlSalidaMinimis(HttpServletRequest request, String codigoOperacion, List<MinimisVO> lista) {
         StringBuffer xmlSalida = new StringBuffer();
-        try {
-            xmlSalida.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            xmlSalida.append("<RESPUESTA>");
-            xmlSalida.append("<CODIGO_OPERACION>");
-            xmlSalida.append(codigoOperacion != null ? codigoOperacion : "2");
-            xmlSalida.append("</CODIGO_OPERACION>");
-            
-            if (lista != null) {
+        xmlSalida.append("<RESPUESTA>");
+        xmlSalida.append("<CODIGO_OPERACION>");
+        xmlSalida.append(codigoOperacion);
+        xmlSalida.append("</CODIGO_OPERACION>");
         for (MinimisVO fila : lista) {
             xmlSalida.append("<FILA>");
             xmlSalida.append("<ID>");
             xmlSalida.append(fila.getId() != null ? fila.getId().toString() : "");
             xmlSalida.append("</ID>");
-            
+
             xmlSalida.append("<ESTADO>");
             xmlSalida.append(fila.getEstado());
             xmlSalida.append("</ESTADO>");
@@ -1210,33 +1719,649 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             xmlSalida.append(fila.getObjeto());
             xmlSalida.append("</OBJETO>");
             xmlSalida.append("<IMPORTE>");
-            if (fila.getImporte()!= null && !"".equals(fila.getImporte())) {
+            if (fila.getImporte() != null && !"".equals(fila.getImporte())) {
                 xmlSalida.append(fila.getImporte());
             } else {
                 xmlSalida.append("null");
             }
             xmlSalida.append("</IMPORTE>");
-           
+
             xmlSalida.append("<FECHA>");
-            if (fila.getFecha()!= null) {
+            if (fila.getFecha() != null) {
                 xmlSalida.append(dateFormat.format(fila.getFecha()));
             } else {
                 xmlSalida.append("");
             }
             xmlSalida.append("</FECHA>");
-          
+
             xmlSalida.append("</FILA>");
         }
-        }
         xmlSalida.append("</RESPUESTA>");
-        log.debug("xml: " + xmlSalida);
         return xmlSalida.toString();
+    }
+
+    /**
+     * Obtiene los complementos salariales y extrasalariales por separado para un
+     * expediente y DNI
+     */
+    public String getComplementosPorTipo(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            String dni = request.getParameter("dni");
+            String numExp = request.getParameter("numExp");
+
+            if (numExp == null) {
+                numExp = numExpediente;
+            }
+
+            AdaptadorSQLBD adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+            ComplementosPorTipo complementos = null;
+            try {
+                complementos = MeLanbide11Manager.getInstance().getSumaComplementosPorTipo(numExp, dni, adapt);
+            } catch (Exception daoEx) {
+                log.error("[getComplementosPorTipo] Error DAO obteniendo complementos", daoEx);
+            }
+            if (complementos == null) {
+                log.warn("[getComplementosPorTipo] complementos es null -> se devuelven 0,0");
+                // Crear dummy para evitar NPE
+                complementos = new ComplementosPorTipo(0d, 0d);
+            }
+
+            // Crear respuesta JSON simple
+            StringBuilder json = new StringBuilder();
+            json.append("{");
+            json.append("\"salariales\":").append(complementos.getSalariales()).append(",");
+            json.append("\"extrasalariales\":").append(complementos.getExtrasalariales());
+            json.append("}");
+
+            response.setContentType("application/json; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
+            PrintWriter out = response.getWriter();
+            out.print(json.toString()); // no cerramos expl�citamente para que el contenedor gestione
+            out.flush();
+            // No navegamos a JSP: respuesta directa JSON
+            return null;
+        } catch (Exception ex) {
+            log.error("Error al obtener complementos por tipo", ex);
+            try {
+                response.setContentType("application/json; charset=UTF-8");
+                response.setCharacterEncoding("UTF-8");
+                response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+                response.setHeader("Pragma", "no-cache");
+                response.setHeader("Expires", "0");
+                PrintWriter out = response.getWriter();
+                out.print("{\"salariales\":0,\"extrasalariales\":0,\"error\":\"Error interno del servidor\"}");
+                out.flush();
+                return null;
+            } catch (Exception e) {
+                log.error("Error al enviar respuesta de error", e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Nueva acci�n para la pantalla de Desglose RSB (modal con pesta�as). Alineada
+     * con la llamada usando parametro operacion=cargarDesgloseRSB. Coloca en
+     * request los atributos necesarios y define las URLs de las pesta�as.
+     */
+    public String cargarDesgloseRSB(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
+        String numExp = null;
+        String idProyecto = null;
+        String idContrato = null;
+        try {
+            numExp = request.getParameter("numExp");
+            if (numExp == null || numExp.trim().isEmpty()) {
+                numExp = numExpediente;
+            }
+            idProyecto = request.getParameter("idProyecto");
+            idContrato = request.getParameter("id");
+
+            request.setAttribute("numExp", numExp);
+            request.setAttribute("idProyecto", idProyecto);
+            if (idContrato != null && idContrato.trim().length() > 0) {
+                request.setAttribute("id", idContrato); // Necesario para Tab1
+            }
+
+            try {
+                if (idContrato != null && idContrato.trim().length() > 0) {
+                    ContratacionVO vo = MeLanbide11Manager.getInstance().getContratacionPorID(idContrato,
+                            this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+                    if (vo != null) {
+                        if (vo.getRsbSalBase() != null) {
+                            request.setAttribute("salarioBase", String.valueOf(vo.getRsbSalBase()).replace('.', ','));
+                        }
+                        if (vo.getRsbPagExtra() != null) {
+                            request.setAttribute("pagasExtra", String.valueOf(vo.getRsbPagExtra()).replace('.', ','));
+                        }
+                        // El campo RSBIMPORTE en tabla contratacion lo usamos como "Complementos
+                        // salariales" persistidos
+                        if (vo.getRsbImporte() != null) {
+                            request.setAttribute("compImporte", String.valueOf(vo.getRsbImporte()).replace('.', ','));
+                        }
+                        // Complementos extrasalariales: SIEMPRE se calculan desde la tabla de desglose
+                        // por RSBTIPO=2
+                        try {
+                            String dni = vo.getDni();
+                            if (dni != null && !dni.trim().isEmpty()) {
+                                ComplementosPorTipo comp = MeLanbide11Manager.getInstance().getSumaComplementosPorTipo(
+                                        numExp, dni, this.getAdaptSQLBD(String.valueOf(codOrganizacion)));
+                                if (comp != null) {
+                                    // Salariales (tipo 1) se usan solo como referencia para comparar con RSBIMPORTE
+                                    // si se quisiera.
+                                    double extras = comp.getExtrasalariales();
+                                    request.setAttribute("compExtra", String.valueOf(extras).replace('.', ','));
+                                    if (log.isDebugEnabled()) {
+                                        // Debug de complementos
+                                    }
+                                } else {
+                                    request.setAttribute("compExtra", "0");
+                                }
+                            }
+                        } catch (Exception calcEx) {
+                            log.warn("[cargarDesgloseRSB] No se pudieron calcular complementos extrasalariales",
+                                    calcEx);
+                        }
+                    }
+                }
+            } catch (Exception inner) {
+                log.warn("[cargarDesgloseRSB] Error cargando datos iniciales de contrataci�n para pesta�a 1", inner);
+            }
+
+            request.setAttribute("urlPestanaResumen", "/jsp/extension/melanbide11/desglose/m11Desglose_Tab1.jsp");
+            request.setAttribute("urlPestanaComplementos", "/jsp/extension/melanbide11/desglose/m11Desglose_Tab2.jsp");
         } catch (Exception e) {
-            log.error("Error generating XML response for minimis", e);
-            // Return a basic error response if XML generation fails
-            return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RESPUESTA><CODIGO_OPERACION>2</CODIGO_OPERACION></RESPUESTA>";
+            log.error("Error en cargarDesgloseRSB", e);
+        }
+        return "/jsp/extension/melanbide11/desglose/m11Desglose.jsp";
+    }
+
+    /**
+     * Operaci�n AJAX invocada desde la pesta�a 1 para guardar los campos b�sicos
+     * del RSB (salario base, pagas extra y total complementos salariales). Recibe
+     * par�metros: idRegistro (ID de la contrataci�n), rsbSalBase, rsbPagasExtra,
+     * rsbCompImporte. Devuelve JSON m�nimo con codigoOperacion 0 si OK.
+     */
+    public String guardarDesgloseRSB(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
+        AdaptadorSQLBD adapt = null;
+        try {
+            adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+        } catch (Exception ex) {
+            log.error("Error obteniendo adaptador BBDD", ex);
+        }
+        String idRegistro = request.getParameter("idRegistro"); // ID de la contrataci�n
+        String sSalBase = request.getParameter("rsbSalBase");
+        String sPagas = request.getParameter("rsbPagasExtra");
+        String sComp = request.getParameter("rsbCompImporte"); // Complementos salariales (principal)
+        // Extrasalariales solo informativos: no se persisten aqu� (vienen del detalle)
+
+        Double vSalBase = parseDoubleSafe(sSalBase);
+        Double vPagas = parseDoubleSafe(sPagas);
+        Double vComp = parseDoubleSafe(sComp);
+
+        int codigoOperacion = 0; // 0 OK,1=BD,2=Sin filas,3=Par�metros,4=Gen�rico
+        double salariales = 0d;
+        double extrasalariales = 0d;
+        if (adapt == null) {
+            codigoOperacion = 4; // sin adaptador
+        } else if (idRegistro == null || idRegistro.trim().isEmpty()) {
+            codigoOperacion = 3; // par�metros
+        } else {
+            try {
+                boolean ok = MeLanbide11Manager.getInstance().guardarDesgloseBasico(idRegistro, vSalBase, vPagas, vComp,
+                        adapt);
+                if (!ok) {
+                    codigoOperacion = 2; // no se actualiz� ninguna fila (ID inexistente?)
+                } else {
+                    // Recuperar totales detallados para refresco r�pido (si tenemos numExp/dni se
+                    // podr�a ampliar)
+                }
+            } catch (Exception e) {
+                log.error("[guardarDesgloseRSB] Error BD", e);
+                codigoOperacion = 1; // error BD
+            }
+        }
+        try {
+            response.setContentType("application/json; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
+            PrintWriter out = response.getWriter();
+            String json = new StringBuilder().append("{\"resultado\":{\"codigoOperacion\":\"").append(codigoOperacion)
+                    .append("\",\"salariales\":").append(salariales).append(",\"extrasalariales\":")
+                    .append(extrasalariales).append("}}").toString();
+            out.print(json);
+            out.flush();
+            return null;
+        } catch (Exception e) {
+            log.error("Error enviando respuesta JSON guardarDesgloseRSB", e);
+        }
+        return null;
+    }
+
+    private Double parseDoubleSafe(String val) {
+        try {
+            if (val == null || val.trim().length() == 0)
+                return null;
+            return new Double(val.replace(',', '.'));
+        } catch (Exception e) {
+            return null;
         }
     }
-    
-    
+
+    /**
+     * Operaci�n AJAX para reemplazar las l�neas del desglose (pesta�a 2).
+     * Par�metros esperados: - numExp - dni - lineas: formato CSV simplificado por
+     * filas separado con ';;' y columnas con '|' =&gt; tipo|importe|concepto|observ
+     * Ej: 1|1234.56|F|Observaci�n l�nea 1;;2|100|V|Obs 2. Devuelve JSON:
+     * {"resultado":{"codigoOperacion":X,"salariales":n,"extrasalariales":m,"totalComputable":t}}
+     */
+    public String guardarLineasDesgloseRSB(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+        String numExp = request.getParameter("numExp");
+        if (numExp == null || numExp.trim().isEmpty()) {
+            numExp = numExpediente; // fallback
+        }
+        String dni = request.getParameter("dni");
+        String raw = request.getParameter("lineas");
+
+        int codigoOperacion = 0; // 0 OK,1 BD,2 Sin filas (todo borrado ok),3 Par�metros,4 Gen�rico
+        double salariales = 0d;
+        double extrasalariales = 0d;
+        double totalComputable = 0d; // RSBCOMPCONV derivado (no lo recalculamos aqu� salvo sumar)
+
+        AdaptadorSQLBD adapt = null;
+        try {
+            adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+        } catch (Exception e) {
+            log.error("[guardarLineasDesgloseRSB] Error obteniendo adaptador", e);
+        }
+
+        if (adapt == null || numExp == null || dni == null || dni.trim().isEmpty()) {
+            codigoOperacion = 3; // par�metros/adaptador
+        } else {
+            try {
+                List<DesgloseRSBVO> lista = parseLineasDesglose(raw);
+                boolean ok = MeLanbide11Manager.getInstance().reemplazarDesgloseRSB(numExp, dni, lista, adapt);
+                if (!ok) {
+                    codigoOperacion = 2; // no se insert� nada (pudo ser solo borrado o fallo silencioso)
+                }
+                // Recuperar sumas por tipo para devolver
+                try {
+                    ComplementosPorTipo comp = MeLanbide11Manager.getInstance().getSumaComplementosPorTipo(numExp, dni,
+                            adapt);
+                    if (comp != null) {
+                        salariales = comp.getSalariales();
+                        extrasalariales = comp.getExtrasalariales();
+                    }
+                    totalComputable = salariales; // se sumar� con salario base y pagas en otra llamada si aplica
+                } catch (Exception sumEx) {
+                    log.warn("[guardarLineasDesgloseRSB] No se pudieron recuperar sumas por tipo", sumEx);
+                }
+            } catch (Exception e) {
+                log.error("[guardarLineasDesgloseRSB] Error BD reemplazando l�neas", e);
+                codigoOperacion = 1; // BD
+            }
+        }
+
+        try {
+            response.setContentType("application/json; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
+            String json = new StringBuilder().append("{\"resultado\":{\"codigoOperacion\":").append(codigoOperacion)
+                    .append(",\"salariales\":").append(salariales).append(",\"extrasalariales\":")
+                    .append(extrasalariales).append(",\"totalComputable\":").append(totalComputable).append("}}")
+                    .toString();
+            PrintWriter out = response.getWriter();
+            out.print(json);
+            out.flush();
+            return null;
+        } catch (Exception ex) {
+            log.error("[guardarLineasDesgloseRSB] Error enviando JSON", ex);
+        }
+        return null;
+    }
+
+    private List<DesgloseRSBVO> parseLineasDesglose(String raw) {
+        // Delegamos en la utilidad para permitir pruebas unitarias independientes.
+        return es.altia.flexia.integracion.moduloexterno.melanbide11.util.DesgloseRSBParser.parse(raw);
+    }
+
+    /**
+     * Acci�n AJAX (pesta�a 2) que devuelve las l�neas del desglose RSB en formato
+     * JSON. Respuesta:
+     * {"lineas":[{"tipo":"1","importe":123.45,"concepto":"X","observ":"Y"},...]}
+     */
+    public String listarLineasDesgloseRSB(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+        AdaptadorSQLBD adapt = null;
+        List<DesgloseRSBVO> lista = new ArrayList<DesgloseRSBVO>();
+        String numExp = request.getParameter("numExp");
+        if (numExp == null || numExp.trim().isEmpty()) {
+            numExp = numExpediente; // fallback
+        }
+        // Par�metro id de la contrataci�n seleccionada (opcional)
+        String idSeleccion = request.getParameter("id");
+        String dniSeleccion = null; // Se resolver� si llega id
+        try {
+            adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+            if (adapt != null && numExp != null && numExp.trim().length() > 0) {
+                boolean usarFiltro = (idSeleccion != null && idSeleccion.trim().length() > 0);
+                if (usarFiltro) {
+                    try {
+                        // Optimizaci�n: resolver s�lo el DNI de la contrataci�n sin cargar toda la
+                        // lista
+                        java.sql.Connection con = null;
+                        try {
+                            con = adapt.getConnection();
+                            dniSeleccion = es.altia.flexia.integracion.moduloexterno.melanbide11.dao.MeLanbide11DAO
+                                    .getInstance().getDniContratacionById(numExp, idSeleccion, con);
+                        } finally {
+                            try {
+                                if (con != null)
+                                    adapt.devolverConexion(con);
+                            } catch (Exception ignore) {
+                            }
+                        }
+                        if (dniSeleccion != null && dniSeleccion.trim().length() > 0) {
+                            lista = MeLanbide11Manager.getInstance().getDatosDesgloseRSBPorDni(numExp, dniSeleccion,
+                                    codOrganizacion, adapt);
+                            if (log.isDebugEnabled()) {
+                                // Debug optimizado
+                            }
+                        } else {
+                            lista = MeLanbide11Manager.getInstance().getDatosDesgloseRSB(numExp, codOrganizacion,
+                                    adapt);
+                            if (log.isDebugEnabled()) {
+                                // Debug sin DNI asociado
+                            }
+                        }
+                    } catch (Exception exId) {
+                        log.warn("[listarLineasDesgloseRSB] Error optimizado resolviendo DNI por ID=" + idSeleccion
+                                + ": " + exId.getMessage(), exId);
+                        lista = MeLanbide11Manager.getInstance().getDatosDesgloseRSB(numExp, codOrganizacion, adapt);
+                    }
+                } else {
+                    lista = MeLanbide11Manager.getInstance().getDatosDesgloseRSB(numExp, codOrganizacion, adapt);
+                }
+            }
+        } catch (Exception e) {
+            log.error("[listarLineasDesgloseRSB] Error recuperando datos", e);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\"dni\":\"").append(escapeJson(dniSeleccion != null ? dniSeleccion : "")).append("\",\"lineas\":[");
+        for (int i = 0; i < lista.size(); i++) {
+            DesgloseRSBVO vo = lista.get(i);
+            if (i > 0)
+                sb.append(',');
+            sb.append('{');
+            sb.append("\"tipo\":\"").append(escapeJson(nvlStr(vo.getRsbTipo()))).append("\",");
+            Double imp = vo.getRsbImporte();
+            sb.append("\"importe\":").append(imp == null ? 0 : imp.doubleValue()).append(',');
+            sb.append("\"concepto\":\"").append(escapeJson(nvlStr(vo.getRsbConcepto()))).append("\",");
+            sb.append("\"observ\":\"").append(escapeJson(nvlStr(vo.getRsbObserv()))).append("\"}");
+        }
+        sb.append("]}");
+
+        try {
+            response.setContentType("application/json; charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
+            PrintWriter out = response.getWriter();
+            out.print(sb.toString());
+            out.flush();
+        } catch (Exception ioe) {
+            log.error("[listarLineasDesgloseRSB] Error enviando respuesta", ioe);
+        }
+        return null; // respuesta directa
+    }
+
+    private static String nvlStr(String v) {
+        return v == null ? "" : v;
+    }
+
+    private static String escapeJson(String s) {
+        if (s == null)
+            return "";
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+            case '"':
+                out.append("\\\"");
+                break;
+            case '\\':
+                out.append("\\\\");
+                break;
+            case '\n':
+                out.append("\\n");
+                break;
+            case '\r':
+                out.append("\\r");
+                break;
+            case '\t':
+                out.append("\\t");
+                break;
+            default:
+                if (c < 32) {
+                    out.append(String.format("\\u%04x", (int) c));
+                } else {
+                    out.append(c);
+                }
+            }
+        }
+        return out.toString();
+    }
+
+    /**
+     * M�todo auxiliar para construir campos JSON de forma segura.
+     */
+    private void appendJsonCampo(StringBuilder json, String campo, String valor, boolean esUltimo) {
+        json.append("\"").append(campo).append("\":");
+        if (valor == null) {
+            json.append("null");
+        } else {
+            json.append("\"").append(escapeJson(valor)).append("\"");
+        }
+        if (!esUltimo) {
+            json.append(",");
+        }
+    }
+
+    /**
+     * Operaci�n AJAX para listar todas las contrataciones de un expediente.
+     * Invocada desde el CRUD de la pesta�a 1.
+     */
+    public String listarContratacionesAJAX(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+
+        AdaptadorSQLBD adapt = null;
+        try {
+            adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+
+            MeLanbide11Manager manager = MeLanbide11Manager.getInstance();
+            List<ContratacionVO> contrataciones = manager.getContratacionesByExpediente(numExpediente, adapt);
+
+            // Construir JSON manualmente
+            StringBuilder json = new StringBuilder();
+            json.append("{\"contrataciones\":[");
+
+            for (int i = 0; i < contrataciones.size(); i++) {
+                if (i > 0)
+                    json.append(",");
+                ContratacionVO c = contrataciones.get(i);
+
+                json.append("{");
+                appendJsonCampo(json, "id", c.getId() != null ? c.getId().toString() : "", false);
+                appendJsonCampo(json, "dni", c.getDni(), false);
+                appendJsonCampo(json, "nombre", c.getNombre(), false);
+                appendJsonCampo(json, "apellido1", c.getApellido1(), false);
+                appendJsonCampo(json, "apellido2", c.getApellido2(), false);
+                appendJsonCampo(json, "puesto", c.getPuesto(), false);
+                appendJsonCampo(json, "rsbSalBase", c.getRsbSalBase() != null ? c.getRsbSalBase().toString() : "",
+                        false);
+                appendJsonCampo(json, "rsbPagExtra", c.getRsbPagExtra() != null ? c.getRsbPagExtra().toString() : "",
+                        false);
+                appendJsonCampo(json, "rsbCompConv", c.getRsbCompConv() != null ? c.getRsbCompConv().toString() : "",
+                        true);
+                json.append("}");
+            }
+
+            json.append("]}");
+
+            response.setContentType("application/json; charset=UTF-8");
+            response.getWriter().write(json.toString());
+
+        } catch (Exception e) {
+            log.error("[listarContratacionesAJAX] Error", e);
+            try {
+                response.setContentType("application/json; charset=UTF-8");
+                response.getWriter()
+                        .write("{\"error\":\"Error cargando contrataciones: " + escapeJson(e.getMessage()) + "\"}");
+            } catch (Exception ex) {
+                log.error("Error escribiendo respuesta de error", ex);
+            }
+        } finally {
+            if (adapt != null) {
+                try {
+                    // No existe m�todo close, no necesitamos cerrar expl�citamente
+                } catch (Exception e) {
+                    log.error("Error cerrando adaptador", e);
+                }
+            }
+        }
+
+        return null; // No JSP, solo respuesta JSON
+    }
+
+    /**
+     * Operaci�n AJAX para eliminar una contrataci�n espec�fica. Invocada desde el
+     * CRUD de la pesta�a 1.
+     */
+    public String eliminarContratacionAJAX(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+        String idStr = request.getParameter("id");
+
+        AdaptadorSQLBD adapt = null;
+        try {
+            if (idStr == null || idStr.trim().isEmpty()) {
+                throw new Exception("ID de contrataci�n requerido");
+            }
+
+            adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+
+            MeLanbide11Manager manager = MeLanbide11Manager.getInstance();
+            boolean eliminado = manager.eliminarContratacionAJAX(idStr, adapt);
+
+            StringBuilder json = new StringBuilder();
+            json.append("{\"resultado\":{");
+            appendJsonCampo(json, "codigoOperacion", eliminado ? "0" : "1", false);
+            appendJsonCampo(json, "mensajeOperacion", eliminado ? "Eliminado correctamente" : "No se pudo eliminar",
+                    true);
+            json.append("}}");
+
+            response.setContentType("application/json; charset=UTF-8");
+            response.getWriter().write(json.toString());
+
+        } catch (Exception e) {
+            log.error("[eliminarContratacionAJAX] Error", e);
+            try {
+                StringBuilder json = new StringBuilder();
+                json.append("{\"resultado\":{");
+                appendJsonCampo(json, "codigoOperacion", "1", false);
+                appendJsonCampo(json, "mensajeOperacion", "Error eliminando: " + escapeJson(e.getMessage()), true);
+                json.append("}}");
+
+                response.setContentType("application/json; charset=UTF-8");
+                response.getWriter().write(json.toString());
+            } catch (Exception ex) {
+                log.error("Error escribiendo respuesta de error", ex);
+            }
+        } finally {
+            if (adapt != null) {
+                try {
+                    // No existe m�todo close, no necesitamos cerrar expl�citamente
+                } catch (Exception e) {
+                    log.error("Error cerrando adaptador", e);
+                }
+            }
+        }
+
+        return null; // No JSP, solo respuesta JSON
+    }
+
+    /**
+     * Operaci�n AJAX para obtener una contrataci�n espec�fica por ID. Invocada
+     * desde el CRUD de la pesta�a 1.
+     */
+    public String getContratacionAJAX(int codOrganizacion, int codTramite, int ocurrenciaTramite, String numExpediente,
+            HttpServletRequest request, HttpServletResponse response) {
+        String idStr = request.getParameter("id");
+
+        AdaptadorSQLBD adapt = null;
+        try {
+            if (idStr == null || idStr.trim().isEmpty()) {
+                throw new Exception("ID de contrataci�n requerido");
+            }
+
+            adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+
+            MeLanbide11Manager manager = MeLanbide11Manager.getInstance();
+            ContratacionVO contratacion = manager.getContratacionById(idStr, adapt);
+
+            if (contratacion == null) {
+                throw new Exception("Contrataci�n no encontrada");
+            }
+
+            StringBuilder json = new StringBuilder();
+            json.append("{\"contratacion\":{");
+            appendJsonCampo(json, "id", contratacion.getId() != null ? contratacion.getId().toString() : "", false);
+            appendJsonCampo(json, "dni", contratacion.getDni(), false);
+            appendJsonCampo(json, "nombre", contratacion.getNombre(), false);
+            appendJsonCampo(json, "apellido1", contratacion.getApellido1(), false);
+            appendJsonCampo(json, "apellido2", contratacion.getApellido2(), false);
+            appendJsonCampo(json, "puesto", contratacion.getPuesto(), false);
+            appendJsonCampo(json, "rsbSalBase",
+                    contratacion.getRsbSalBase() != null ? contratacion.getRsbSalBase().toString() : "", false);
+            appendJsonCampo(json, "rsbPagExtra",
+                    contratacion.getRsbPagExtra() != null ? contratacion.getRsbPagExtra().toString() : "", false);
+            appendJsonCampo(json, "rsbCompConv",
+                    contratacion.getRsbCompConv() != null ? contratacion.getRsbCompConv().toString() : "", true);
+            json.append("}}");
+
+            response.setContentType("application/json; charset=UTF-8");
+            response.getWriter().write(json.toString());
+
+        } catch (Exception e) {
+            log.error("[getContratacionAJAX] Error", e);
+            try {
+                response.setContentType("application/json; charset=UTF-8");
+                response.getWriter()
+                        .write("{\"error\":\"Error obteniendo contrataci�n: " + escapeJson(e.getMessage()) + "\"}");
+            } catch (Exception ex) {
+                log.error("Error escribiendo respuesta de error", ex);
+            }
+        } finally {
+            if (adapt != null) {
+                try {
+                    // No existe m�todo close, no necesitamos cerrar expl�citamente
+                } catch (Exception e) {
+                    log.error("Error cerrando adaptador", e);
+                }
+            }
+        }
+
+        return null; // No JSP, solo respuesta JSON
+    }
 }
