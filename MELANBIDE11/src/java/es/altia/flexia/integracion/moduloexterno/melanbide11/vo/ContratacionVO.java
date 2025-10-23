@@ -2,6 +2,7 @@
 package es.altia.flexia.integracion.moduloexterno.melanbide11.vo;
 
 import java.sql.Date;
+import org.apache.log4j.Logger;
 
 /*
     CONTRATACI�N: DATOS SELECCI�N														
@@ -61,14 +62,16 @@ import java.sql.Date;
 */
 
 public class ContratacionVO {
-    
+
+    private static final Logger log = Logger.getLogger(ContratacionVO.class);
+
     private Integer id;
     private String numExp;
-    
+
     private String oferta;
     private String idContrato1;
     private String idContrato2;
-    
+
     private String dni;
     private String nombre;
     private String apellido1;
@@ -78,10 +81,13 @@ public class ContratacionVO {
     private String sexo;
     private String desSexo;
     private String mayor55;
+    private String desMayor55;
     private String finFormativa;
+    private String desFinFormativa;
+
     private String codFormativa;
     private String denFormativa;
-    
+
     private String puesto;
     private String ocupacion;
     private String desOcupacion;
@@ -89,7 +95,6 @@ public class ContratacionVO {
     private String titulacion;
     private String desTitulacionLibre;
     private String desTitulacion;
-    private String titulacionRequerida;
     private String cProfesionalidad;
     private String desCProfesionalidad;
     private String modalidadContrato;
@@ -107,8 +112,23 @@ public class ContratacionVO {
     private Double costeContrato;
     private String tipRetribucion;
     private String desTipRetribucion;
-    
+
     private Double importeSub;
+
+    // Nuevos campos MELANBIDE11: TITREQPUESTO y FUNCIONES
+    private String titReqPuesto;
+    private String desTitReqPuesto;
+    private String funciones;
+
+    // Nuevos campos MELANBIDE11: Retribuci�n salarial bruta
+    private Double rsbSalBase; // RSBSALBASE - Salario base
+    private Double rsbPagExtra; // RSBPAGEXTRA - Pagas extraordinarias
+    private Double rsbImporte; // RSBIMPORTE - Complementos salariales
+    private Double rsbCompConv; // RSBCOMPCONV - Retribuci�n salarial bruta computable para la convocatoria
+                                // (TOTAL CALCULADO)
+    // Campo tipo de complemento (1 = salarial, 2 = extrasalarial). Solo hay un
+    // importe RSBIMPORTE
+    private String rsbTipo; // RSBTIPO
 
     public Integer getId() {
         return id;
@@ -222,12 +242,28 @@ public class ContratacionVO {
         this.mayor55 = mayor55;
     }
 
+    public String getDesMayor55() {
+        return desMayor55;
+    }
+
+    public void setDesMayor55(String desMayor55) {
+        this.desMayor55 = desMayor55;
+    }
+
     public String getFinFormativa() {
         return finFormativa;
     }
 
     public void setFinFormativa(String finFormativa) {
         this.finFormativa = finFormativa;
+    }
+
+    public String getDesFinFormativa() {
+        return desFinFormativa;
+    }
+
+    public void setDesFinFormativa(String desFinFormativa) {
+        this.desFinFormativa = desFinFormativa;
     }
 
     public String getCodFormativa() {
@@ -277,7 +313,7 @@ public class ContratacionVO {
     public void setDesOcupacionLibre(String desOcupacionLibre) {
         this.desOcupacionLibre = desOcupacionLibre;
     }
-    
+
     public String getDesTitulacionLibre() {
         return desTitulacionLibre;
     }
@@ -300,14 +336,6 @@ public class ContratacionVO {
 
     public void setDesTitulacion(String desTitulacion) {
         this.desTitulacion = desTitulacion;
-    }
-
-    public String getTitulacionRequerida() {
-        return titulacionRequerida;
-    }
-
-    public void setTitulacionRequerida(String titulacionRequerida) {
-        this.titulacionRequerida = titulacionRequerida;
     }
 
     public String getcProfesionalidad() {
@@ -356,6 +384,36 @@ public class ContratacionVO {
 
     public void setPorcJornada(Double porcJornada) {
         this.porcJornada = porcJornada;
+    }
+
+    // Getters y setters para titReqPuesto
+    public String getTitReqPuesto() {
+        return titReqPuesto;
+    }
+
+    public void setTitReqPuesto(String titReqPuesto) {
+        this.titReqPuesto = titReqPuesto;
+    }
+
+    public String getDesTitReqPuesto() {
+        return desTitReqPuesto;
+    }
+
+    public void setDesTitReqPuesto(String desTitReqPuesto) {
+        this.desTitReqPuesto = desTitReqPuesto;
+    }
+
+    // Getter y setter para funciones
+    public String getFunciones() {
+        return funciones;
+    }
+
+    public void setFunciones(String funciones) {
+        if (funciones != null && funciones.length() > 200) {
+            this.funciones = funciones.substring(0, 200);
+        } else {
+            this.funciones = funciones;
+        }
     }
 
     public Integer getHorasConv() {
@@ -454,5 +512,59 @@ public class ContratacionVO {
         this.importeSub = importeSub;
     }
 
-    
+    // Getters y Setters para campos de Retribuci�n Salarial Bruta
+    public Double getRsbSalBase() {
+        return rsbSalBase;
+    }
+
+    public void setRsbSalBase(Double rsbSalBase) {
+        this.rsbSalBase = rsbSalBase;
+    }
+
+    public Double getRsbPagExtra() {
+        return rsbPagExtra;
+    }
+
+    public void setRsbPagExtra(Double rsbPagExtra) {
+        this.rsbPagExtra = rsbPagExtra;
+    }
+
+    public Double getRsbImporte() {
+        return rsbImporte;
+    }
+
+    public void setRsbImporte(Double rsbImporte) {
+        this.rsbImporte = rsbImporte;
+    }
+
+    public Double getRsbCompConv() {
+        return rsbCompConv;
+    }
+
+    public void setRsbCompConv(Double rsbCompConv) {
+        this.rsbCompConv = rsbCompConv;
+    }
+
+    public String getRsbTipo() {
+        return rsbTipo;
+    }
+
+    public void setRsbTipo(String rsbTipo) {
+        this.rsbTipo = rsbTipo;
+    }
+
+    // M�todo para obtener la retribuci�n salarial bruta computable total
+    // El total se calcula sumando: salario base + pagas extras + complementos
+    // salariales (de tabla DESGRSB)
+    // y se almacena en rsbCompConv
+    public Double getRsbComputableTotal() {
+        if (log != null && log.isDebugEnabled()) {
+            log.debug("*** ContratacionVO.getRsbComputableTotal() llamado ***");
+            log.debug("- ID: " + (this.id != null ? this.id : "NULL"));
+            log.debug("- rsbCompConv (valor calculado): " + (this.rsbCompConv != null ? this.rsbCompConv : "NULL"));
+            log.debug("*** Retornando: " + (rsbCompConv != null ? rsbCompConv : 0.0) + " ***");
+        }
+        return rsbCompConv != null ? rsbCompConv : 0.0;
+    }
+
 }

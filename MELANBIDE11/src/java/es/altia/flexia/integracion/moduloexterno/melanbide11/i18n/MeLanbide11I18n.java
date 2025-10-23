@@ -35,11 +35,11 @@ public class MeLanbide11I18n
     
     /**
      * Constructor privado
-     * Recupera los ficheros de propiedades del módulo y los carga para que solo se lean una vez.
+     * Recupera los ficheros de propiedades del mÃ³dulo y los carga para que solo se lean una vez.
      */
     private MeLanbide11I18n()
     {
-        //Recuperamos del bundle de propiedades la propiedad que indica los archivos de mensajes de que dispone el m�dulo.
+        //Recuperamos del bundle de propiedades la propiedad que indica los archivos de mensajes de que dispone el módulo.
         String archivos = bundlePropiedades.getString("FICHEROS_MENSAJES");
         String ubicacion = bundlePropiedades.getString("UBICACION_FICHEROS_MENSAJES");
         if(archivos != null && !archivos.equalsIgnoreCase(""))
@@ -67,8 +67,8 @@ public class MeLanbide11I18n
     }
     
     /**
-     * Devuelve el valor de la clave de los ficheros de properties de mensajes que están cargados por defecto.
-     * Si no existe devuelve un string vacío.
+     * Devuelve el valor de la clave de los ficheros de properties de mensajes que estÃ¡n cargados por defecto.
+     * Si no existe devuelve un string vacÃ­o.
      * @param codIdioma
      * @param key
      * @return String

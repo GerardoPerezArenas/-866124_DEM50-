@@ -1,0 +1,17 @@
+# Build artifacts
+MELANBIDE11/build/
+MELANBIDE11/dist/
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*~

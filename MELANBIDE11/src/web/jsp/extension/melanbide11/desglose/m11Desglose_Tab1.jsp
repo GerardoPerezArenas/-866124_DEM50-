@@ -364,6 +364,7 @@
           document.getElementById('rsbPagasExtra').value = '';
           document.getElementById('rsbCompImporte').value = '';
           document.getElementById('rsbCompExtra').value = '';
+          document.getElementById('rsbComputableTotal').value = '0,00';
         } catch(e) {
           console.warn("Error limpiando formulario Tab1:", e);
         }
@@ -394,6 +395,69 @@
       
     
       setTimeout(verificarRegistroSeleccionado, 100);
+
+      /**
+       * TAREA 5: Recalcula el RSB Computable automaticamente
+       */
+      function recalcularRsbComputable() {
+          console.log('=== Recalculando RSB Computable ===');
+          
+          var salarioBase = parseFloat($('#rsbSalBase').val().replace(',', '.')) || 0;
+          var pagasExtra = parseFloat($('#rsbPagasExtra').val().replace(',', '.')) || 0;
+          var sumaFijos = 0;
+          
+          // Nota: listaLineasTipo1 se define en Tab2 cuando se cargan los complementos
+          // Si existe, sumamos solo los complementos FIJOS
+          if (typeof listaLineasTipo1 !== 'undefined' && listaLineasTipo1.length > 0) {
+              for (var i = 0; i < listaLineasTipo1.length; i++) {
+                  var linea = listaLineasTipo1[i];
+                  var concepto = linea[1] || '';
+                  var importe = parseFloat((linea[0] || '0').toString().replace(',', '.')) || 0;
+                  
+                  if (concepto.toUpperCase() === 'FIJO' || concepto.toUpperCase() === 'F') {
+                      sumaFijos += importe;
+                  }
+              }
+          }
+          
+          var rsbComputable = salarioBase + pagasExtra + sumaFijos;
+          
+          var campo = document.getElementById('rsbComputableTotal');
+          if (campo) {
+              campo.value = rsbComputable.toFixed(2).replace('.', ',');
+          }
+          
+          console.log('Salario Base:', salarioBase);
+          console.log('Pagas Extra:', pagasExtra);
+          console.log('Suma Fijos:', sumaFijos);
+          console.log('RSB Computable:', rsbComputable);
+          
+          return rsbComputable;
+      }
+
+      // Configurar eventos para recalculo automático
+      $(document).ready(function() {
+          // Recalcular cuando cambian los campos base
+          $('#rsbSalBase, #rsbPagExtra').on('change keyup blur', function() {
+              recalcularRsbComputable();
+          });
+          
+          // Hook para guardarLineasDesglose si existe
+          var guardarLineasOriginal = window.guardarLineasDesglose;
+          if (typeof guardarLineasOriginal === 'function') {
+              window.guardarLineasDesglose = function(callback) {
+                  guardarLineasOriginal.call(this, function(resultado) {
+                      recalcularRsbComputable();
+                      if (typeof callback === 'function') {
+                          callback(resultado);
+                      }
+                  });
+              };
+          }
+          
+          // Recalcular al cargar
+          setTimeout(recalcularRsbComputable, 500);
+      });
 
    
       function cerrarVentana(resultado) {
@@ -558,6 +622,32 @@
             <div class="campoFormulario">
               <input id="rsbCompExtra" name="rsbCompExtra" type="text" class="inputTexto" size="10" maxlength="10"
                      onchange="reemplazarPuntos(this);" onblur="validarNumeroReal(this);" value="<%=vCompExtra%>" />
+            </div>
+          </div>
+
+          <%-- TAREA 5: RSB Computable (calculado) --%>
+          <div class="lineaFormulario" style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #2b62b5;">
+            <div class="etiquetaLPEEL">
+              <span class="label-bilingual">
+                <span class="label-es" style="font-weight: bold; color: #2b62b5;">
+                  <%=meLanbide11I18n.getMensaje(1,"label.m11.rsbComputable")%>
+                </span>
+                <span class="label-eu" style="font-weight: bold; color: #2b62b5;">
+                  <%=meLanbide11I18n.getMensaje(2,"label.m11.rsbComputable")%>
+                </span>
+              </span>
+            </div>
+            <div class="campoFormulario">
+              <input type="text" 
+                     id="rsbComputableTotal" 
+                     name="rsbComputableTotal" 
+                     class="inputTexto" 
+                     readonly="readonly"
+                     style="background-color:#e6f2ff; font-weight:bold; color:#0066cc; text-align:right; border:2px solid #2b62b5;"
+                     value="0,00" />
+              <small style="color:#666; margin-left:8px;">
+                <i class="fa fa-calculator"></i> Calculado automaticamente
+              </small>
             </div>
           </div>
         

@@ -1,4 +1,3 @@
-
 package es.altia.flexia.integracion.moduloexterno.melanbide11.manager;
 
 import com.lanbide.lan6.errores.bean.ErrorBean;
@@ -6,6 +5,7 @@ import com.lanbide.lan6.registro.error.RegistroErrores;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.ContratacionVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.MinimisVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.dao.MeLanbide11DAO;
+import es.altia.flexia.integracion.moduloexterno.melanbide11.dao.MeLanbide11DAO.ComplementosPorTipo;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.util.ConfigurationParameter;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.util.ConstantesMeLanbide11;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DatosTablaDesplegableExtVO;
@@ -13,6 +13,8 @@ import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesplegableAdmon
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesplegableExternoVO;
 import es.altia.util.conexion.AdaptadorSQLBD;
 import es.altia.util.conexion.BDException;
+import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRSBVO;
+
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +22,10 @@ import org.apache.log4j.Logger;
 
 public class MeLanbide11Manager {
 
-    //Logger
+    // Logger
     private static Logger log = Logger.getLogger(MeLanbide11Manager.class);
 
-    //Instancia
+    // Instancia
     private static MeLanbide11Manager instance = null;
 
     public static MeLanbide11Manager getInstance() {
@@ -46,7 +48,7 @@ public class MeLanbide11Manager {
             if ("".equals(numExp)) {
                 numExp = "0000/ERRMISGEST/000000";
             }
-           
+
             String idProcedimiento = "DEM50";
             log.error("procedimiento: " + idProcedimiento);
             error.setIdProcedimiento(idProcedimiento);
@@ -62,41 +64,70 @@ public class MeLanbide11Manager {
         }
     }
 
-    public List<ContratacionVO> getDatosContratacion(String numExp, int codOrganizacion, AdaptadorSQLBD adapt) throws Exception {
+    public List<ContratacionVO> getDatosContratacion(String numExp, int codOrganizacion, AdaptadorSQLBD adapt)
+            throws Exception {
         List<ContratacionVO> lista = new ArrayList<ContratacionVO>();
         Connection con = null;
         try {
             con = adapt.getConnection();
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             lista = meLanbide11DAO.getDatosContratacion(numExp, codOrganizacion, con);
-            //recuperamos los cod y desc de desplegables para traducir en la tabla principal
-            List<DesplegableAdmonLocalVO> listaSexo = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_SEXO, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-            List<DesplegableAdmonLocalVO> listaMayor55 = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-            List<DesplegableAdmonLocalVO> listaFinFormativa = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-            List<DesplegableAdmonLocalVO> listaJornada = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_JORN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-            List<DesplegableAdmonLocalVO> listaGrupoCotizacion = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_GCOT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-            List<DesplegableAdmonLocalVO> listaTipRetribucion = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTRT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-           
-           
-            //desplegables externos
-            DatosTablaDesplegableExtVO datosTablaDesplegableOcupaciones = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_OCIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            // recuperamos los cod y desc de desplegables para traducir en la tabla
+            // principal
+            List<DesplegableAdmonLocalVO> listaSexo = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_SEXO, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaMayor55 = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaFinFormativa = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaJornada = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_JORN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaGrupoCotizacion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_GCOT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaTipRetribucion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_DTRT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaTitReqPuesto = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_TITREQPUESTO,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            adapt);
+
+            // desplegables externos
+            DatosTablaDesplegableExtVO datosTablaDesplegableOcupaciones = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_EXT_OCIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
             String tablaOcupaciones = datosTablaDesplegableOcupaciones.getTabla();
             String campoCodigoOcupaciones = datosTablaDesplegableOcupaciones.getCampoCodigo();
             String campoValorOcupaciones = datosTablaDesplegableOcupaciones.getCampoValor();
-            List<DesplegableExternoVO> listaOcupacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaOcupaciones, campoCodigoOcupaciones, campoValorOcupaciones, adapt);
-        
-            DatosTablaDesplegableExtVO datosTablaDesplegableTitulaciones = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_TIIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableExternoVO> listaOcupacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(
+                    tablaOcupaciones, campoCodigoOcupaciones, campoValorOcupaciones, adapt);
+
+            DatosTablaDesplegableExtVO datosTablaDesplegableTitulaciones = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_EXT_TIIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
             String tablaTitulaciones = datosTablaDesplegableTitulaciones.getTabla();
             String campoCodigoTitulaciones = datosTablaDesplegableTitulaciones.getCampoCodigo();
             String campoValorTitulaciones = datosTablaDesplegableTitulaciones.getCampoValor();
-            List<DesplegableExternoVO> listaTitulacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaTitulaciones, campoCodigoTitulaciones, campoValorTitulaciones, adapt);
-       
-            DatosTablaDesplegableExtVO datosTablaDesplegableCProfesionales = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_CPIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableExternoVO> listaTitulacion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesExternos(tablaTitulaciones, campoCodigoTitulaciones, campoValorTitulaciones,
+                            adapt);
+
+            DatosTablaDesplegableExtVO datosTablaDesplegableCProfesionales = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_EXT_CPIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
             String tablaCProfesionales = datosTablaDesplegableCProfesionales.getTabla();
             String campoCodigoCProfesionales = datosTablaDesplegableCProfesionales.getCampoCodigo();
             String campoValorCProfesionales = datosTablaDesplegableCProfesionales.getCampoValor();
-            List<DesplegableExternoVO> listaCProfesionalidad = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaCProfesionales, campoCodigoCProfesionales, campoValorCProfesionales, adapt);
-            
+            List<DesplegableExternoVO> listaCProfesionalidad = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesExternos(tablaCProfesionales, campoCodigoCProfesionales,
+                            campoValorCProfesionales, adapt);
+
             for (ContratacionVO cont : lista) {
                 for (DesplegableAdmonLocalVO valordesp : listaSexo) {
                     if (valordesp.getDes_val_cod().equals(cont.getSexo())) {
@@ -122,6 +153,13 @@ public class MeLanbide11Manager {
                         break;
                     }
                 }
+                // Traducci贸n de TitReqPuesto usando desplegable INTERNO (listaTitReqPuesto)
+                for (DesplegableAdmonLocalVO valordesp : listaTitReqPuesto) {
+                    if (valordesp.getDes_val_cod().equals(cont.getTitReqPuesto())) {
+                        cont.setDesTitReqPuesto(valordesp.getDes_nom());
+                        break;
+                    }
+                }
                 for (DesplegableAdmonLocalVO valordesp : listaGrupoCotizacion) {
                     if (valordesp.getDes_val_cod().equals(cont.getGrupoCotizacion())) {
                         cont.setDesGrupoCotizacion(valordesp.getDes_nom());
@@ -134,14 +172,19 @@ public class MeLanbide11Manager {
                         break;
                     }
                 }
-                
-                //desplegables externos
+
+                // desplegables externos
                 for (DesplegableExternoVO valordesp : listaOcupacion) {
                     if (valordesp.getCampoCodigo().equals(cont.getOcupacion())) {
                         cont.setDesOcupacion(valordesp.getCampoValor());
                         break;
                     }
                 }
+                // Inicializar desTitulacion con el c贸digo original como fallback
+                if (cont.getTitulacion() != null && !"".equals(cont.getTitulacion().trim())) {
+                    cont.setDesTitulacion(cont.getTitulacion()); // fallback al c贸digo
+                }
+                // Intentar traducir con el desplegable externo
                 for (DesplegableExternoVO valordesp : listaTitulacion) {
                     if (valordesp.getCampoCodigo().equals(cont.getTitulacion())) {
                         cont.setDesTitulacion(valordesp.getCampoValor());
@@ -155,19 +198,19 @@ public class MeLanbide11Manager {
                     }
                 }
             }
-            
+
             return lista;
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando datos sobre las contrataciones ", e);
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando datos sobre las contrataciones ", e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando datos sobre las contrataciones ", ex);
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando datos sobre las contrataciones ", ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
     }
@@ -179,10 +222,10 @@ public class MeLanbide11Manager {
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             return meLanbide11DAO.getContratacionPorID(id, con);
         } catch (BDException e) {
-            log.error("Se ha producido una excepcion en la BBDD recuperando datos sobre una contrataci髇:  " + id, e);
+            log.error("Se ha producido una excepcion en la BBDD recuperando datos sobre una contrataci贸n:  " + id, e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepcion en la BBDD recuperando datos sobre una contrataci髇:  " + id, ex);
+            log.error("Se ha producido una excepcion en la BBDD recuperando datos sobre una contrataci贸n:  " + id, ex);
             throw new Exception(ex);
         } finally {
             try {
@@ -200,16 +243,16 @@ public class MeLanbide11Manager {
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             return meLanbide11DAO.eliminarContratacion(id, con);
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD al eliminar una contrataci髇:  " + id, e);
+            log.error("Se ha producido una excepci贸n en la BBDD al eliminar una contrataci贸n:  " + id, e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 en la BBDD al eliminar una contrataci髇:   " + id, ex);
+            log.error("Se ha producido una excepci贸n en la BBDD al eliminar una contrataci贸n:   " + id, ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
     }
@@ -222,34 +265,62 @@ public class MeLanbide11Manager {
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             lista = meLanbide11DAO.getContratacion(numExp, con);
 
-            //recuperamos los cod y desc de desplegables para traducir en la tabla principal
-            List<DesplegableAdmonLocalVO> listaSexo = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_SEXO, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-            List<DesplegableAdmonLocalVO> listaMayor55 = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-            List<DesplegableAdmonLocalVO> listaFinFormativa = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-            List<DesplegableAdmonLocalVO> listaJornada = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_JORN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-            List<DesplegableAdmonLocalVO> listaGrupoCotizacion = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_GCOT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-            List<DesplegableAdmonLocalVO> listaTipRetribucion = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTRT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-           
-            
-            //desplegables externos
-            DatosTablaDesplegableExtVO datosTablaDesplegableOcupaciones = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_OCIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            // recuperamos los cod y desc de desplegables para traducir en la tabla
+            // principal
+            List<DesplegableAdmonLocalVO> listaSexo = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_SEXO, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaMayor55 = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaFinFormativa = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_BOOL, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaJornada = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_JORN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaGrupoCotizacion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_GCOT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaTipRetribucion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_DTRT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableAdmonLocalVO> listaTitReqPuesto = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(
+                            ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_TITREQPUESTO,
+                                    ConstantesMeLanbide11.FICHERO_PROPIEDADES),
+                            adapt);
+
+            // desplegables externos
+            DatosTablaDesplegableExtVO datosTablaDesplegableOcupaciones = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_EXT_OCIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
             String tablaOcupaciones = datosTablaDesplegableOcupaciones.getTabla();
             String campoCodigoOcupaciones = datosTablaDesplegableOcupaciones.getCampoCodigo();
             String campoValorOcupaciones = datosTablaDesplegableOcupaciones.getCampoValor();
-            List<DesplegableExternoVO> listaOcupacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaOcupaciones, campoCodigoOcupaciones, campoValorOcupaciones, adapt);
-        
-            DatosTablaDesplegableExtVO datosTablaDesplegableTitulaciones = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_TIIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableExternoVO> listaOcupacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(
+                    tablaOcupaciones, campoCodigoOcupaciones, campoValorOcupaciones, adapt);
+
+            DatosTablaDesplegableExtVO datosTablaDesplegableTitulaciones = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_EXT_TIIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
             String tablaTitulaciones = datosTablaDesplegableTitulaciones.getTabla();
             String campoCodigoTitulaciones = datosTablaDesplegableTitulaciones.getCampoCodigo();
             String campoValorTitulaciones = datosTablaDesplegableTitulaciones.getCampoValor();
-            List<DesplegableExternoVO> listaTitulacion = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaTitulaciones, campoCodigoTitulaciones, campoValorTitulaciones, adapt);
-            
-            DatosTablaDesplegableExtVO datosTablaDesplegableCProfesionales = MeLanbide11Manager.getInstance().getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_EXT_CPIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+            List<DesplegableExternoVO> listaTitulacion = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesExternos(tablaTitulaciones, campoCodigoTitulaciones, campoValorTitulaciones,
+                            adapt);
+
+            DatosTablaDesplegableExtVO datosTablaDesplegableCProfesionales = MeLanbide11Manager.getInstance()
+                    .getDatosMapeoDesplegableExterno(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_EXT_CPIN, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
             String tablaCProfesionales = datosTablaDesplegableCProfesionales.getTabla();
             String campoCodigoCProfesionales = datosTablaDesplegableCProfesionales.getCampoCodigo();
             String campoValorCProfesionales = datosTablaDesplegableCProfesionales.getCampoValor();
-            List<DesplegableExternoVO> listaCProfesionalidad = MeLanbide11Manager.getInstance().getValoresDesplegablesExternos(tablaCProfesionales, campoCodigoCProfesionales, campoValorCProfesionales, adapt);
-            
+            List<DesplegableExternoVO> listaCProfesionalidad = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesExternos(tablaCProfesionales, campoCodigoCProfesionales,
+                            campoValorCProfesionales, adapt);
+
             for (ContratacionVO cont : lista) {
                 for (DesplegableAdmonLocalVO valordesp : listaSexo) {
                     if (valordesp.getDes_val_cod().equals(cont.getSexo())) {
@@ -275,6 +346,13 @@ public class MeLanbide11Manager {
                         break;
                     }
                 }
+                // NUEVO: descripci贸n TITREQPUESTO
+                for (DesplegableAdmonLocalVO valordesp : listaTitReqPuesto) {
+                    if (valordesp.getDes_val_cod().equals(cont.getTitReqPuesto())) {
+                        cont.setDesTitReqPuesto(valordesp.getDes_nom());
+                        break;
+                    }
+                }
                 for (DesplegableAdmonLocalVO valordesp : listaGrupoCotizacion) {
                     if (valordesp.getDes_val_cod().equals(cont.getGrupoCotizacion())) {
                         cont.setDesGrupoCotizacion(valordesp.getDes_nom());
@@ -287,14 +365,19 @@ public class MeLanbide11Manager {
                         break;
                     }
                 }
-                
-                //desplegables externos
+
+                // desplegables externos
                 for (DesplegableExternoVO valordesp : listaOcupacion) {
                     if (valordesp.getCampoCodigo().equals(cont.getOcupacion())) {
                         cont.setDesOcupacion(valordesp.getCampoValor());
                         break;
                     }
                 }
+                // Inicializar desTitulacion con el c贸digo original como fallback
+                if (cont.getTitulacion() != null && !"".equals(cont.getTitulacion().trim())) {
+                    cont.setDesTitulacion(cont.getTitulacion()); // fallback al c贸digo
+                }
+                // Intentar traducir con el desplegable externo
                 for (DesplegableExternoVO valordesp : listaTitulacion) {
                     if (valordesp.getCampoCodigo().equals(cont.getTitulacion())) {
                         cont.setDesTitulacion(valordesp.getCampoValor());
@@ -307,20 +390,31 @@ public class MeLanbide11Manager {
                         break;
                     }
                 }
+
+                // Log detallado de campos RSB despu茅s del mapeo
+                log.info("*** MANAGER RSB DEBUG *** Contrataci贸n ID: " + cont.getId());
+                log.info("*** MANAGER RSB *** rsbSalBase: "
+                        + (cont.getRsbSalBase() != null ? cont.getRsbSalBase() : "NULL"));
+                log.info("*** MANAGER RSB *** rsbPagExtra: "
+                        + (cont.getRsbPagExtra() != null ? cont.getRsbPagExtra() : "NULL"));
+                log.info("*** MANAGER RSB *** rsbCompConv: "
+                        + (cont.getRsbCompConv() != null ? cont.getRsbCompConv() : "NULL"));
+                log.info("*** MANAGER RSB *** rsbComputableTotal calculado: "
+                        + (cont.getRsbComputableTotal() != null ? cont.getRsbComputableTotal() : "NULL"));
             }
-            
+
             return lista;
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando las contrataciones:  " + e);
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando las contrataciones:  " + e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 general en la BBDD recuperando las contrataciones:   " + ex);
+            log.error("Se ha producido una excepci贸n general en la BBDD recuperando las contrataciones:   " + ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
     }
@@ -333,16 +427,16 @@ public class MeLanbide11Manager {
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             insertOK = meLanbide11DAO.crearNuevaContratacion(nuevaContratacion, con);
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD creando una contrataci髇 : " + e.getMessage(), e);
+            log.error("Se ha producido una excepci贸n en la BBDD creando una contrataci贸n : " + e.getMessage(), e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 en la BBDD creando una contrataci髇 : " + ex.getMessage(), ex);
+            log.error("Se ha producido una excepci贸n en la BBDD creando una contrataci贸n : " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
         return insertOK;
@@ -356,21 +450,22 @@ public class MeLanbide11Manager {
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             insertOK = meLanbide11DAO.modificarContratacion(datModif, con);
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD actualizando una contrataci髇 : " + e.getMessage(), e);
+            log.error("Se ha producido una excepci贸n en la BBDD actualizando una contrataci贸n : " + e.getMessage(), e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 en la BBDD actualizando una contrataci髇 : " + ex.getMessage(), ex);
+            log.error("Se ha producido una excepci贸n en la BBDD actualizando una contrataci贸n : " + ex.getMessage(),
+                    ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
         return insertOK;
     }
-    
+
     public List<MinimisVO> getDatosMinimis(String numExp, int codOrganizacion, AdaptadorSQLBD adapt) throws Exception {
         List<MinimisVO> lista = new ArrayList<MinimisVO>();
         Connection con = null;
@@ -378,9 +473,12 @@ public class MeLanbide11Manager {
             con = adapt.getConnection();
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             lista = meLanbide11DAO.getDatosMinimis(numExp, codOrganizacion, con);
-            //recuperamos los cod y desc de desplegables para traducir en la tabla principal
-            List<DesplegableAdmonLocalVO> listaEstado = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTSV, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-       
+            // recuperamos los cod y desc de desplegables para traducir en la tabla
+            // principal
+            List<DesplegableAdmonLocalVO> listaEstado = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_DTSV, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+
             for (MinimisVO cont : lista) {
                 for (DesplegableAdmonLocalVO valordesp : listaEstado) {
                     if (valordesp.getDes_val_cod().equals(cont.getEstado())) {
@@ -389,19 +487,19 @@ public class MeLanbide11Manager {
                     }
                 }
             }
-            
+
             return lista;
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando datos sobre las minimis ", e);
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando datos sobre las minimis ", e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando datos sobre las minimis ", ex);
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando datos sobre las minimis ", ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
     }
@@ -434,16 +532,16 @@ public class MeLanbide11Manager {
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             return meLanbide11DAO.eliminarMinimis(id, con);
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD al eliminar una minimis:  " + id, e);
+            log.error("Se ha producido una excepci贸n en la BBDD al eliminar una minimis:  " + id, e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 en la BBDD al eliminar una minimis:   " + id, ex);
+            log.error("Se ha producido una excepci贸n en la BBDD al eliminar una minimis:   " + id, ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
     }
@@ -456,9 +554,12 @@ public class MeLanbide11Manager {
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             lista = meLanbide11DAO.getMinimis(numExp, con);
 
-            //recuperamos los cod y desc de desplegables para traducir en la tabla principal
-            List<DesplegableAdmonLocalVO> listaEstado = MeLanbide11Manager.getInstance().getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(ConstantesMeLanbide11.COD_DES_DTSV, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
-       
+            // recuperamos los cod y desc de desplegables para traducir en la tabla
+            // principal
+            List<DesplegableAdmonLocalVO> listaEstado = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_DTSV, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+
             for (MinimisVO cont : lista) {
                 for (DesplegableAdmonLocalVO valordesp : listaEstado) {
                     if (valordesp.getDes_val_cod().equals(cont.getEstado())) {
@@ -467,19 +568,19 @@ public class MeLanbide11Manager {
                     }
                 }
             }
-            
+
             return lista;
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando las minimis:  " + e);
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando las minimis:  " + e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 general en la BBDD recuperando las minimis:   " + ex);
+            log.error("Se ha producido una excepci贸n general en la BBDD recuperando las minimis:   " + ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
     }
@@ -492,16 +593,16 @@ public class MeLanbide11Manager {
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             insertOK = meLanbide11DAO.crearNuevaMinimis(nuevaMinimis, con);
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD creando una minimis : " + e.getMessage(), e);
+            log.error("Se ha producido una excepci贸n en la BBDD creando una minimis : " + e.getMessage(), e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 en la BBDD creando una minimis : " + ex.getMessage(), ex);
+            log.error("Se ha producido una excepci贸n en la BBDD creando una minimis : " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
         return insertOK;
@@ -515,83 +616,388 @@ public class MeLanbide11Manager {
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             insertOK = meLanbide11DAO.modificarMinimis(datModif, con);
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD actualizando una minimis : " + e.getMessage(), e);
+            log.error("Se ha producido una excepci贸n en la BBDD actualizando una minimis : " + e.getMessage(), e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 en la BBDD actualizando una minimis : " + ex.getMessage(), ex);
+            log.error("Se ha producido una excepci贸n en la BBDD actualizando una minimis : " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
         return insertOK;
     }
 
-    public List<DesplegableAdmonLocalVO> getValoresDesplegablesAdmonLocalxdes_cod(String des_cod, AdaptadorSQLBD adapt) throws Exception {
+    public List<DesgloseRSBVO> getDatosDesgloseRSB(String numExp, int codOrganizacion, AdaptadorSQLBD adapt)
+            throws Exception {
+        List<DesgloseRSBVO> lista = new ArrayList<DesgloseRSBVO>();
+        Connection con = null;
+        try {
+            con = adapt.getConnection();
+            MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
+            lista = meLanbide11DAO.getDatosDesgloseRSB(numExp, codOrganizacion, con);
+
+            // Recupera cod/desc de desplegables para traducir en la tabla principal
+            List<DesplegableAdmonLocalVO> listaTipo = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_RSBT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+
+            List<DesplegableAdmonLocalVO> listaConcepto = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_RSBC, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+
+            for (DesgloseRSBVO det : lista) {
+                // RSBTIPO -> desTipo
+                for (DesplegableAdmonLocalVO val : listaTipo) {
+                    if (val.getDes_val_cod().equals(det.getRsbTipo())) {
+                        det.setDesRsbTipo(val.getDes_nom());
+                        break;
+                    }
+                }
+                // RSBCONCEPTO -> desConcepto
+                for (DesplegableAdmonLocalVO val : listaConcepto) {
+                    if (val.getDes_val_cod().equals(det.getRsbConcepto())) {
+                        det.setDesRsbConcepto(val.getDes_nom());
+                        break;
+                    }
+                }
+            }
+
+            return lista;
+        } catch (BDException e) {
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando datos del desglose RSB ", e);
+            throw new Exception(e);
+        } catch (Exception ex) {
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando datos del desglose RSB ", ex);
+            throw new Exception(ex);
+        } finally {
+            try {
+                adapt.devolverConexion(con);
+            } catch (Exception e) {
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Versi贸n filtrada por DNI: evita traer todas las l铆neas y filtrar en memoria.
+     */
+    public List<DesgloseRSBVO> getDatosDesgloseRSBPorDni(String numExp, String dni, int codOrganizacion,
+            AdaptadorSQLBD adapt) throws Exception {
+        List<DesgloseRSBVO> lista = new ArrayList<DesgloseRSBVO>();
+        Connection con = null;
+        try {
+            con = adapt.getConnection();
+            MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
+            lista = meLanbide11DAO.getDatosDesgloseRSBPorDni(numExp, dni, codOrganizacion, con);
+
+            // Traducci贸n de desplegables igual que en m茅todo general
+            List<DesplegableAdmonLocalVO> listaTipo = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_RSBT, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+
+            List<DesplegableAdmonLocalVO> listaConcepto = MeLanbide11Manager.getInstance()
+                    .getValoresDesplegablesAdmonLocalxdes_cod(ConfigurationParameter.getParameter(
+                            ConstantesMeLanbide11.COD_DES_RSBC, ConstantesMeLanbide11.FICHERO_PROPIEDADES), adapt);
+
+            for (DesgloseRSBVO det : lista) {
+                for (DesplegableAdmonLocalVO val : listaTipo) {
+                    if (val.getDes_val_cod().equals(det.getRsbTipo())) {
+                        det.setDesRsbTipo(val.getDes_nom());
+                        break;
+                    }
+                }
+                for (DesplegableAdmonLocalVO val : listaConcepto) {
+                    if (val.getDes_val_cod().equals(det.getRsbConcepto())) {
+                        det.setDesRsbConcepto(val.getDes_nom());
+                        break;
+                    }
+                }
+            }
+            return lista;
+        } catch (BDException e) {
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando datos del desglose RSB (por DNI)", e);
+            throw new Exception(e);
+        } catch (Exception ex) {
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando datos del desglose RSB (por DNI)", ex);
+            throw new Exception(ex);
+        } finally {
+            try {
+                adapt.devolverConexion(con);
+            } catch (Exception e) {
+                log.error("Error al cerrar conexi贸n a la BBDD (por DNI): " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Guarda los valores b谩sicos del desglose RSB (salario base, pagas extra y suma
+     * de complementos salariales) en la contrataci贸n indicada recalculando
+     * RSBCOMPCONV. No gestiona todav铆a el detalle de l铆neas de la pesta帽a 2.
+     *
+     * @param idRegistro     ID de la contrataci贸n (tabla principal)
+     * @param salarioBase    Salario base
+     * @param pagasExtra     Pagas extraordinarias
+     * @param compSalariales Complementos salariales (importe total)
+     * @param adapt          Adaptador BBDD
+     * @return true si la actualizaci贸n fue correcta
+     * @throws Exception
+     */
+    public boolean guardarDesgloseBasico(String idRegistro, Double salarioBase, Double pagasExtra,
+            Double compSalariales, AdaptadorSQLBD adapt) throws Exception {
+        Connection con = null;
+        try {
+            con = adapt.getConnection();
+            MeLanbide11DAO dao = MeLanbide11DAO.getInstance();
+            return dao.actualizarDesgloseBasico(idRegistro, salarioBase, pagasExtra, compSalariales, con);
+        } catch (BDException e) {
+            log.error("Excepci贸n BBDD guardando desglose b谩sico RSB id=" + idRegistro, e);
+            throw new Exception(e);
+        } catch (Exception ex) {
+            log.error("Excepci贸n guardando desglose b谩sico RSB id=" + idRegistro, ex);
+            throw new Exception(ex);
+        } finally {
+            try {
+                adapt.devolverConexion(con);
+            } catch (Exception e) {
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Nueva versi贸n que incluye rsbTipo (1 = salarial, 2 = extrasalarial). El
+     * importe compSalariales se guarda siempre en RSBIMPORTE y el tipo en RSBTIPO.
+     */
+    public boolean guardarDesgloseBasico(String idRegistro, Double salarioBase, Double pagasExtra,
+            Double compSalariales, String rsbTipo, AdaptadorSQLBD adapt) throws Exception {
+        Connection con = null;
+        try {
+            con = adapt.getConnection();
+            MeLanbide11DAO dao = MeLanbide11DAO.getInstance();
+            return dao.actualizarDesgloseBasico(idRegistro, salarioBase, pagasExtra, compSalariales, rsbTipo, con);
+        } catch (BDException e) {
+            log.error("Excepci贸n BBDD guardando desglose b谩sico RSB (tipo) id=" + idRegistro, e);
+            throw new Exception(e);
+        } catch (Exception ex) {
+            log.error("Excepci贸n guardando desglose b谩sico RSB (tipo) id=" + idRegistro, ex);
+            throw new Exception(ex);
+        } finally {
+            try {
+                adapt.devolverConexion(con);
+            } catch (Exception e) {
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Obtiene los complementos salariales y extrasalariales por separado
+     * 
+     * @param numExp N煤mero de expediente
+     * @param dni    DNI del contratado
+     * @param adapt  Adaptador de base de datos
+     * @return ComplementosPorTipo con las sumas separadas
+     * @throws Exception
+     */
+    public ComplementosPorTipo getSumaComplementosPorTipo(String numExp, String dni, AdaptadorSQLBD adapt)
+            throws Exception {
+        Connection con = null;
+        try {
+            con = adapt.getConnection();
+            MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
+            return meLanbide11DAO.getSumaComplementosPorTipo(numExp, dni, con);
+        } catch (BDException e) {
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando complementos por tipo", e);
+            throw new Exception(e);
+        } catch (Exception ex) {
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando complementos por tipo", ex);
+            throw new Exception(ex);
+        } finally {
+            try {
+                adapt.devolverConexion(con);
+            } catch (Exception e) {
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
+            }
+        }
+    }
+
+    public DesgloseRSBVO getDesgloseRSBPorID(String id, AdaptadorSQLBD adapt) throws Exception {
+        Connection con = null;
+        try {
+            con = adapt.getConnection();
+            MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
+            return meLanbide11DAO.getDesgloseRSBPorID(id, con);
+        } catch (BDException e) {
+            log.error("Se ha producido una excepcion en la BBDD recuperando un registro de desglose RSB: " + id, e);
+            throw new Exception(e);
+        } catch (Exception ex) {
+            log.error("Se ha producido una excepcion en la BBDD recuperando un registro de desglose RSB: " + id, ex);
+            throw new Exception(ex);
+        } finally {
+            try {
+                adapt.devolverConexion(con);
+            } catch (Exception e) {
+                log.error("Error al cerrar conexion a la BBDD: " + e.getMessage());
+            }
+        }
+    }
+
+    /*
+     * M茅todo comentado temporalmente: depend铆a de un DAO inexistente
+     * getDniDesdeDesglosePorExpediente(String, Connection). Si se necesita en el
+     * futuro deber谩 implementarse primero en MeLanbide11DAO (SELECT DISTINCT
+     * DNICONT ...) y ajustar el tipo de retorno (String o lista). Mientras tanto se
+     * elimina para permitir la compilaci贸n.
+     */
+    // public String getDniDesdeDesglosePorExpediente(String numExp, AdaptadorSQLBD
+    // adapt) throws Exception {
+    // Connection con = null;
+    // try {
+    // con = adapt.getConnection();
+    // MeLanbide11DAO dao = MeLanbide11DAO.getInstance();
+    // return dao.getDniDesdeDesglosePorExpediente(numExp, con);
+    // } catch (BDException e) {
+    // log.error("Excepci贸n BBDD obteniendo DNI desde desglose por expediente
+    // numExp=" + numExp, e);
+    // throw new Exception(e);
+    // } catch (Exception ex) {
+    // log.error("Excepci贸n obteniendo DNI desde desglose por expediente numExp=" +
+    // numExp, ex);
+    // throw new Exception(ex);
+    // } finally {
+    // try { adapt.devolverConexion(con); } catch (Exception e) { log.error("Error
+    // al cerrar conexi贸n a la BBDD: " + e.getMessage()); }
+    // }
+    // }
+
+    /**
+     * Reemplaza (borrando e insertando) las l铆neas del desglose RSB para un
+     * expediente + DNI, y recalcula autom谩ticamente RSBCOMPCONV.
+     */
+    public boolean reemplazarDesgloseRSB(String numExp, String dni, List<DesgloseRSBVO> lineas, AdaptadorSQLBD adapt)
+            throws Exception {
+        Connection con = null;
+        try {
+            con = adapt.getConnection();
+            MeLanbide11DAO dao = MeLanbide11DAO.getInstance();
+            return dao.reemplazarDesgloseRSB(numExp, dni, lineas, con);
+        } catch (BDException e) {
+            log.error("Excepci贸n BBDD reemplazando desglose RSB numExp=" + numExp + ", dni=" + dni, e);
+            throw new Exception(e);
+        } catch (Exception ex) {
+            log.error("Excepci贸n reemplazando desglose RSB numExp=" + numExp + ", dni=" + dni, ex);
+            throw new Exception(ex);
+        } finally {
+            try {
+                adapt.devolverConexion(con);
+            } catch (Exception e) {
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
+            }
+        }
+    }
+
+    public List<DesplegableAdmonLocalVO> getValoresDesplegablesAdmonLocalxdes_cod(String des_cod, AdaptadorSQLBD adapt)
+            throws Exception {
         Connection con = null;
         try {
             con = adapt.getConnection();
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             return meLanbide11DAO.getValoresDesplegablesAdmonLocalxdes_cod(des_cod, con);
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando valores de desplegable : " + des_cod, e);
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando valores de desplegable : " + des_cod, e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando valores de desplegable :  " + des_cod, ex);
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando valores de desplegable :  " + des_cod, ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
     }
-    
-    public DatosTablaDesplegableExtVO getDatosMapeoDesplegableExterno(String des_cod, AdaptadorSQLBD adapt) throws Exception {
+
+    public DatosTablaDesplegableExtVO getDatosMapeoDesplegableExterno(String des_cod, AdaptadorSQLBD adapt)
+            throws Exception {
         Connection con = null;
         try {
             con = adapt.getConnection();
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             return meLanbide11DAO.getDatosMapeoDesplegableExterno(des_cod, con);
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando valores de datos de tabla de desplegable externo : " + des_cod, e);
+            log.error(
+                    "Se ha producido una excepci贸n en la BBDD recuperando valores de datos de tabla de desplegable externo : "
+                            + des_cod,
+                    e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando valores de datos de tabla de desplegable externo :  " + des_cod, ex);
+            log.error(
+                    "Se ha producido una excepci贸n en la BBDD recuperando valores de datos de tabla de desplegable externo :  "
+                            + des_cod,
+                    ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
     }
 
-    public List<DesplegableExternoVO> getValoresDesplegablesExternos(String tablaDesplegable, String campoCodigo, String campoValor, AdaptadorSQLBD adapt) throws Exception {
+    public List<DesplegableExternoVO> getValoresDesplegablesExternos(String tablaDesplegable, String campoCodigo,
+            String campoValor, AdaptadorSQLBD adapt) throws Exception {
         Connection con = null;
         try {
             con = adapt.getConnection();
             MeLanbide11DAO meLanbide11DAO = MeLanbide11DAO.getInstance();
             return meLanbide11DAO.getValoresDesplegablesExternos(tablaDesplegable, campoCodigo, campoValor, con);
         } catch (BDException e) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando valores de desplegable externo de tabla : " + tablaDesplegable, e);
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando valores de desplegable externo de tabla : "
+                    + tablaDesplegable, e);
             throw new Exception(e);
         } catch (Exception ex) {
-            log.error("Se ha producido una excepci髇 en la BBDD recuperando valores de desplegable externo de tabla :  " + tablaDesplegable, ex);
+            log.error("Se ha producido una excepci贸n en la BBDD recuperando valores de desplegable externo de tabla :  "
+                    + tablaDesplegable, ex);
             throw new Exception(ex);
         } finally {
             try {
                 adapt.devolverConexion(con);
             } catch (Exception e) {
-                log.error("Error al cerrar conexi髇 a la BBDD: " + e.getMessage());
+                log.error("Error al cerrar conexi贸n a la BBDD: " + e.getMessage());
             }
         }
     }
 
-    
+    /**
+     * Obtiene todas las contrataciones de un expediente espec铆fico. M茅todo adaptado
+     * para AJAX CRUD.
+     */
+    public List<ContratacionVO> getContratacionesByExpediente(String numExpediente, AdaptadorSQLBD adapt)
+            throws Exception {
+        log.debug("getContratacionesByExpediente (AJAX) - numExp: " + numExpediente);
+        return this.getContrataciones(numExpediente, adapt);
+    }
+
+    /**
+     * Elimina una contrataci贸n por ID. M茅todo adaptado para AJAX CRUD.
+     */
+    public boolean eliminarContratacionAJAX(String idStr, AdaptadorSQLBD adapt) throws Exception {
+        log.debug("eliminarContratacionAJAX (AJAX) - id: " + idStr);
+        int resultado = this.eliminarContratacion(idStr, adapt);
+        return resultado > 0;
+    }
+
+    /**
+     * Obtiene una contrataci贸n espec铆fica por ID. M茅todo adaptado para AJAX CRUD.
+     */
+    public ContratacionVO getContratacionById(String idStr, AdaptadorSQLBD adapt) throws Exception {
+        log.debug("getContratacionById (AJAX) - id: " + idStr);
+        return this.getContratacionPorID(idStr, adapt);
+    }
 }

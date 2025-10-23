@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Context configuration for MELANBIDE11 module
+    
+    This configuration optimizes JSP compilation by configuring which JARs
+    Tomcat should scan for Tag Library Descriptors (TLDs).
+    
+    The jarsToSkip pattern excludes most JARs from TLD scanning, except those
+    that are known to contain tag libraries (jstl, standard, taglibs-*).
+    
+    This significantly improves application startup time and JSP compilation
+    performance when dealing with a large number of JAR files (400+ in this case).
+-->
+<Context>
+    <JarScanner>
+        <!-- 
+            Skip most JARs during TLD scanning to improve performance.
+            Only scan JARs that are known to contain tag libraries.
+            
+            Pattern explanation:
+            - We skip all JARs by default (*.jar)
+            - Exception: jstl*.jar, standard*.jar, taglibs*.jar are NOT skipped
+              (these contain actual TLD files needed for JSP tag libraries)
+        -->
+        <JarScanFilter 
+            defaultTldScan="false"
+            defaultPluggabilityScan="false"
+            pluggabilitySkip="*.jar"
+            tldSkip="*.jar"
+            tldScan="jstl*.jar,standard*.jar,taglibs*.jar" />
+    </JarScanner>
+</Context>

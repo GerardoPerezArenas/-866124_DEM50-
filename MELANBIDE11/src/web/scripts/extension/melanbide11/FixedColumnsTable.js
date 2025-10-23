@@ -666,7 +666,7 @@ function seleccionarFila(rowID,tableName){
   if(indiceAnt != rowID){
     tabla.selectedIndex = rowID;
     if (document.all){
-      with(eval('document.all.tbl_'+tableName+'.parentElement.parentElement.parentElement')){
+      var _root = eval('document.all.tbl_'+tableName+'.parentElement.parentElement.parentElement');
         //tabla.selectLinea(rowID);
         if(document.getElementById('frozencontent_'+tableName)){
             if(document.getElementById('frozencontent_'+tableName).children[0]){
@@ -689,9 +689,8 @@ function seleccionarFila(rowID,tableName){
                 }
             }
         }
-      }
     }else if (document.getElementById){
-      with(document.getElementById('tbl_'+tableName).parentNode.parentNode.parentNode){
+      var _tblParent = document.getElementById('tbl_'+tableName).parentNode.parentNode.parentNode;
         //tabla.selectLinea(rowID);
         if(document.getElementById('frozencontent_'+tableName)){
             if(document.getElementById('frozencontent_'+tableName).children[0]){
@@ -712,7 +711,6 @@ function seleccionarFila(rowID,tableName){
               document.getElementById('innercontent_'+tableName).children[0].children[indiceAnt].className = 'pendienteEstaUnidad';
             }
         }
-      }
     }
   }
   //callClick(rowID,tableName);
