@@ -1,0 +1,32 @@
+=== HERRAMIENTAS DE DESARROLLO MELANBIDE ===
+
+🔧 GENERADORES DISPONIBLES:
+  gen-vo <nombre>              - Generar Value Object
+  gen-tab <nombre> <vo>        - Generar nueva pestaña  
+  gen-dropdown <nombre>        - Generar desplegable completo
+  gen-column <vo> <jsp> <col>  - Agregar columna a tabla
+
+📁 NAVEGACIÓN RÁPIDA:
+  cdmel     - Ir al directorio del proyecto
+  cdauto    - Ir a automation-tools
+  cdsrc     - Ir a src/
+  cdjava    - Ir a src/java/
+  cdjsp     - Ir a JSPs de melanbide11
+
+🏗️ BUILD Y DEPLOY:
+  mel-build   - Compilar proyecto
+  mel-deploy  - Compilar y generar JAR
+
+📋 UTILIDADES:
+  mel-help    - Mostrar esta ayuda
+  mel-status  - Estado del proyecto
+
+💡 EJEMPLOS DE USO:
+  gen-vo Documento
+  gen-tab Documentacion DocumentoVO
+  gen-dropdown TipoDocumento
+  gen-column ContratacionVO melanbide11 telefono VARCHAR(20)
+
+📖 Para más información, consulta:
+  automation-tools/README.md
+  automation-tools/examples/
