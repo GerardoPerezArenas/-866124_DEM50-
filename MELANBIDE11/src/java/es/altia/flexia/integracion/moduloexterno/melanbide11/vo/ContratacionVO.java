@@ -109,6 +109,11 @@ public class ContratacionVO {
     private String desTipRetribucion;
     
     private Double importeSub;
+    
+    // Campos para desglose de retribución
+    private Double salarioBase;
+    private Double pagasExtraordinarias;
+    private Double retribucionComputable;
 
     public Integer getId() {
         return id;
@@ -454,5 +459,28 @@ public class ContratacionVO {
         this.importeSub = importeSub;
     }
 
+    public Double getSalarioBase() {
+        return salarioBase;
+    }
+
+    public void setSalarioBase(Double salarioBase) {
+        this.salarioBase = salarioBase;
+    }
+
+    public Double getPagasExtraordinarias() {
+        return pagasExtraordinarias;
+    }
+
+    public void setPagasExtraordinarias(Double pagasExtraordinarias) {
+        this.pagasExtraordinarias = pagasExtraordinarias;
+    }
+
+    public Double getRetribucionComputable() {
+        return retribucionComputable;
+    }
+
+    public void setRetribucionComputable(Double retribucionComputable) {
+        this.retribucionComputable = retribucionComputable;
+    }
     
 }

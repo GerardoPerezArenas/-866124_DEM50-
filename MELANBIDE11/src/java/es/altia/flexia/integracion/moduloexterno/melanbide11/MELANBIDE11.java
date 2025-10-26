@@ -14,6 +14,8 @@ import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.MinimisVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DatosTablaDesplegableExtVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesplegableAdmonLocalVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesplegableExternoVO;
+import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRetribucionVO;
+import java.math.BigDecimal;
 import es.altia.flexia.integracion.moduloexterno.plugin.ModuloIntegracionExterno;
 import es.altia.technical.PortableContext;
 import es.altia.util.conexion.AdaptadorSQLBD;
@@ -1236,6 +1238,186 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             // Return a basic error response if XML generation fails
             return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><RESPUESTA><CODIGO_OPERACION>2</CODIGO_OPERACION></RESPUESTA>";
         }
+    }
+    
+    /**
+     * Lista las líneas de desglose de retribución salarial bruta para un expediente
+     * Devuelve JSON con las líneas y el DNI de la contratación
+     */
+    public void listarLineasDesgloseRSB(int codOrganizacion, int codTramite, int ocurrenciaTramite, 
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+        log.debug("Entramos en listarLineasDesgloseRSB");
+        
+        response.setContentType("application/json; charset=UTF-8");
+        PrintWriter out = null;
+        
+        try {
+            out = response.getWriter();
+            
+            String idContrato = request.getParameter("id");
+            AdaptadorSQLBD adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+            
+            // Obtener la contratación para recuperar el DNI
+            String dni = "";
+            if (idContrato != null && !idContrato.isEmpty()) {
+                List<ContratacionVO> listaContrataciones = MeLanbide11Manager.getInstance().getDatosContratacion(numExpediente, codOrganizacion, adapt);
+                for (ContratacionVO cont : listaContrataciones) {
+                    if (cont.getId() != null && cont.getId().toString().equals(idContrato)) {
+                        dni = cont.getDni() != null ? cont.getDni() : "";
+                        break;
+                    }
+                }
+            }
+            
+            // Si no hay DNI, devolver respuesta vacía
+            if (dni == null || dni.trim().isEmpty()) {
+                String jsonResponse = "{\"dni\":\"\",\"lineas\":[]}";
+                out.print(jsonResponse);
+                return;
+            }
+            
+            // Obtener las líneas de desglose
+            List<DesgloseRetribucionVO> lineas = MeLanbide11Manager.getInstance().getLineasDesgloseRSB(numExpediente, dni, adapt);
+            
+            // Construir respuesta JSON manualmente
+            StringBuilder jsonResponse = new StringBuilder();
+            jsonResponse.append("{\"dni\":\"").append(escapeJson(dni)).append("\",\"lineas\":[");
+            
+            if (lineas != null && !lineas.isEmpty()) {
+                for (int i = 0; i < lineas.size(); i++) {
+                    DesgloseRetribucionVO linea = lineas.get(i);
+                    if (i > 0) {
+                        jsonResponse.append(",");
+                    }
+                    jsonResponse.append("{");
+                    jsonResponse.append("\"tipo\":").append(linea.getTipo() != null ? linea.getTipo() : 1).append(",");
+                    jsonResponse.append("\"importe\":").append(linea.getImporte() != null ? linea.getImporte().doubleValue() : 0.0).append(",");
+                    jsonResponse.append("\"concepto\":\"").append(escapeJson(linea.getConcepto() != null ? linea.getConcepto() : "")).append("\",");
+                    jsonResponse.append("\"observ\":\"").append(escapeJson(linea.getObservaciones() != null ? linea.getObservaciones() : "")).append("\"");
+                    jsonResponse.append("}");
+                }
+            }
+            jsonResponse.append("]}");
+            
+            out.print(jsonResponse.toString());
+            
+        } catch (Exception ex) {
+            log.error("Error en listarLineasDesgloseRSB", ex);
+            try {
+                if (out != null) {
+                    String errorResponse = "{\"error\":true,\"mensaje\":\"Error al listar líneas de desglose\"}";
+                    out.print(errorResponse);
+                }
+            } catch (Exception e) {
+                log.error("Error escribiendo respuesta de error", e);
+            }
+        } finally {
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
+        }
+    }
+    
+    /**
+     * Guarda las líneas de desglose de retribución salarial bruta
+     * Recibe las líneas en formato: tipo|importe|concepto|observ;;tipo|importe|concepto|observ...
+     */
+    public void guardarLineasDesgloseRSB(int codOrganizacion, int codTramite, int ocurrenciaTramite,
+            String numExpediente, HttpServletRequest request, HttpServletResponse response) {
+        log.debug("Entramos en guardarLineasDesgloseRSB");
+        
+        response.setContentType("application/json; charset=UTF-8");
+        PrintWriter out = null;
+        
+        try {
+            out = response.getWriter();
+            
+            String dni = request.getParameter("dni");
+            String lineasRaw = request.getParameter("lineas");
+            
+            // Validar parámetros
+            if (dni == null || dni.trim().isEmpty()) {
+                String errorResponse = "{\"resultado\":{\"codigoOperacion\":\"3\"}}"; // Parámetros insuficientes
+                out.print(errorResponse);
+                return;
+            }
+            
+            AdaptadorSQLBD adapt = this.getAdaptSQLBD(String.valueOf(codOrganizacion));
+            
+            // Parsear líneas
+            List<DesgloseRetribucionVO> lineas = new ArrayList<DesgloseRetribucionVO>();
+            
+            if (lineasRaw != null && !lineasRaw.trim().isEmpty()) {
+                String[] filas = lineasRaw.split(";;");
+                for (String fila : filas) {
+                    if (fila != null && !fila.trim().isEmpty()) {
+                        String[] campos = fila.split("\\|");
+                        if (campos.length >= 4) {
+                            DesgloseRetribucionVO linea = new DesgloseRetribucionVO();
+                            linea.setNumExp(numExpediente);
+                            linea.setDni(dni);
+                            
+                            try {
+                                linea.setTipo(Integer.parseInt(campos[0]));
+                            } catch (NumberFormatException e) {
+                                linea.setTipo(1);
+                            }
+                            
+                            try {
+                                linea.setImporte(new BigDecimal(campos[1]));
+                            } catch (NumberFormatException e) {
+                                linea.setImporte(BigDecimal.ZERO);
+                            }
+                            
+                            linea.setConcepto(campos[2]);
+                            linea.setObservaciones(campos[3]);
+                            
+                            lineas.add(linea);
+                        }
+                    }
+                }
+            }
+            
+            // Guardar líneas
+            boolean exito = MeLanbide11Manager.getInstance().guardarLineasDesgloseRSB(numExpediente, dni, lineas, adapt);
+            
+            // Construir respuesta JSON manualmente
+            String codigoOperacion = exito ? "0" : "1"; // 0=éxito, 1=error
+            String jsonResponse = "{\"resultado\":{\"codigoOperacion\":\"" + codigoOperacion + "\"}}";
+            
+            out.print(jsonResponse);
+            
+        } catch (Exception ex) {
+            log.error("Error en guardarLineasDesgloseRSB", ex);
+            try {
+                if (out != null) {
+                    String errorResponse = "{\"resultado\":{\"codigoOperacion\":\"1\"}}"; // Error
+                    out.print(errorResponse);
+                }
+            } catch (Exception e) {
+                log.error("Error escribiendo respuesta de error", e);
+            }
+        } finally {
+            if (out != null) {
+                out.flush();
+                out.close();
+            }
+        }
+    }
+    
+    /**
+     * Escapa caracteres especiales para JSON
+     */
+    private String escapeJson(String str) {
+        if (str == null) {
+            return "";
+        }
+        return str.replace("\\", "\\\\")
+                  .replace("\"", "\\\"")
+                  .replace("\n", "\\n")
+                  .replace("\r", "\\r")
+                  .replace("\t", "\\t");
     }
     
     

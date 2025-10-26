@@ -9,6 +9,7 @@ import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.MinimisVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DatosTablaDesplegableExtVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesplegableAdmonLocalVO;
 import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesplegableExternoVO;
+import es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRetribucionVO;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -700,6 +701,114 @@ public class MeLanbide11DAO {
             }
         }
         return lista;
+    }
+    
+    /**
+     * Obtiene las líneas de desglose de retribución para un expediente y DNI
+     */
+    public List<es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRetribucionVO> getLineasDesgloseRSB(
+            String numExp, String dni, Connection con) throws Exception {
+        Statement st = null;
+        ResultSet rs = null;
+        List<es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRetribucionVO> lista = 
+            new ArrayList<es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRetribucionVO>();
+        
+        try {
+            String query = "SELECT * FROM MELANBIDE11_DESGLOSE_RSB " +
+                          "WHERE NUM_EXP = '" + numExp + "' AND DNI = '" + dni + "' " +
+                          "ORDER BY TIPO, ID";
+            
+            if (log.isDebugEnabled()) {
+                log.debug("sql getLineasDesgloseRSB = " + query);
+            }
+            
+            st = con.createStatement();
+            rs = st.executeQuery(query);
+            
+            while (rs.next()) {
+                es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRetribucionVO desglose = 
+                    (es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRetribucionVO) 
+                    MeLanbide11MappingUtils.getInstance().mapDesgloseRetribucion(
+                        rs, es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRetribucionVO.class);
+                lista.add(desglose);
+            }
+        } catch (Exception ex) {
+            log.error("Error recuperando líneas de desglose RSB para numExp=" + numExp + ", dni=" + dni, ex);
+            throw new Exception(ex);
+        } finally {
+            if (st != null) {
+                st.close();
+            }
+            if (rs != null) {
+                rs.close();
+            }
+        }
+        
+        return lista;
+    }
+    
+    /**
+     * Elimina todas las líneas de desglose de retribución para un expediente y DNI
+     */
+    public int eliminarLineasDesgloseRSB(String numExp, String dni, Connection con) throws Exception {
+        Statement st = null;
+        
+        try {
+            String query = "DELETE FROM MELANBIDE11_DESGLOSE_RSB " +
+                          "WHERE NUM_EXP = '" + numExp + "' AND DNI = '" + dni + "'";
+            
+            if (log.isDebugEnabled()) {
+                log.debug("sql eliminarLineasDesgloseRSB = " + query);
+            }
+            
+            st = con.createStatement();
+            return st.executeUpdate(query);
+        } catch (Exception ex) {
+            log.error("Error eliminando líneas de desglose RSB para numExp=" + numExp + ", dni=" + dni, ex);
+            throw new Exception(ex);
+        } finally {
+            if (st != null) {
+                st.close();
+            }
+        }
+    }
+    
+    /**
+     * Inserta una nueva línea de desglose de retribución
+     */
+    public boolean insertarLineaDesgloseRSB(
+            es.altia.flexia.integracion.moduloexterno.melanbide11.vo.DesgloseRetribucionVO lineaDesglose, 
+            Connection con) throws Exception {
+        Statement st = null;
+        
+        try {
+            int id = recogerIDInsertar("SEQ_MELANBIDE11_DESGLOSE_RSB", con);
+            
+            String query = "INSERT INTO MELANBIDE11_DESGLOSE_RSB " +
+                          "(ID, NUM_EXP, DNI, TIPO, IMPORTE, CONCEPTO, OBSERVACIONES) VALUES (" +
+                          id + ", '" +
+                          (lineaDesglose.getNumExp() != null ? lineaDesglose.getNumExp() : "") + "', '" +
+                          (lineaDesglose.getDni() != null ? lineaDesglose.getDni() : "") + "', " +
+                          (lineaDesglose.getTipo() != null ? lineaDesglose.getTipo() : "null") + ", " +
+                          (lineaDesglose.getImporte() != null ? lineaDesglose.getImporte().toString() : "0") + ", '" +
+                          (lineaDesglose.getConcepto() != null ? lineaDesglose.getConcepto() : "") + "', '" +
+                          (lineaDesglose.getObservaciones() != null ? lineaDesglose.getObservaciones().replace("'", "''") : "") + "')";
+            
+            if (log.isDebugEnabled()) {
+                log.debug("sql insertarLineaDesgloseRSB = " + query);
+            }
+            
+            st = con.createStatement();
+            st.executeUpdate(query);
+            return true;
+        } catch (Exception ex) {
+            log.error("Error insertando línea de desglose RSB", ex);
+            throw new Exception(ex);
+        } finally {
+            if (st != null) {
+                st.close();
+            }
+        }
     }
     
     
