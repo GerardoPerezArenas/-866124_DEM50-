@@ -1620,6 +1620,7 @@
                     cerrarVentana();
                 }
             }
+            window.cancelar = cancelar;
 
             function cerrarVentana() {
                 if (navigator.appName == "Microsoft Internet Explorer") {
