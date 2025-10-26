@@ -1067,10 +1067,10 @@ public class MELANBIDE11 extends ModuloIntegracionExterno {
             xmlSalida.append(getDescripcionDesplegable(request, fila.getDesSexo()));
             xmlSalida.append("</SEXOCONT>");
             xmlSalida.append("<MAY55CONT>");
-            xmlSalida.append(fila.getMayor55());
+            xmlSalida.append(getDescripcionDesplegable(request, fila.getMayor55()));
             xmlSalida.append("</MAY55CONT>");
             xmlSalida.append("<ACCFORCONT>");
-            xmlSalida.append(fila.getFinFormativa());
+            xmlSalida.append(getDescripcionDesplegable(request, fila.getFinFormativa()));
             xmlSalida.append("</ACCFORCONT>");
             xmlSalida.append("<CODFORCONT>");
             xmlSalida.append(fila.getCodFormativa());
