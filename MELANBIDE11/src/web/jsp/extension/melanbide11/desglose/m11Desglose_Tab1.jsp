@@ -182,9 +182,14 @@
 
       function procesarRespuestaGuardar(ajaxResult){
         elementoVisible('off', 'barraProgresoLPEEL');
+        if (!ajaxResult || !ajaxResult.trim()) {
+          console.error('Respuesta vacía al guardar desglose RSB');
+          jsp_alerta('A', 'Se ha recibido una respuesta vacía del servidor.');
+          return;
+        }
         try{
-          var datos = JSON.parse(ajaxResult);
-         
+          var datos = JSON.parse(ajaxResult || '{}');
+
           var codigoOperacion = datos && datos.resultado ? datos.resultado.codigoOperacion : "4";
           if (codigoOperacion == "0"){
             console.log("Desglose RSB guardado exitosamente - cerrando modal");
@@ -212,6 +217,7 @@
             jsp_alerta('A', document.getElementById('generico').value);
           }
         }catch(e){
+          console.error('Error procesando respuesta de guardado RSB:', e);
           jsp_alerta('A', document.getElementById('generico').value);
         }
       }
@@ -309,8 +315,13 @@
             data: parametros,
             success: function(ajaxResult) {
               elementoVisible('off', 'barraProgresoLPEEL');
+              if (!ajaxResult || !ajaxResult.trim()) {
+                console.error('Respuesta vacía al eliminar contratación RSB');
+                jsp_alerta('A', 'Se ha recibido una respuesta vacía del servidor.');
+                return;
+              }
               try {
-                var datos = JSON.parse(ajaxResult);
+                var datos = JSON.parse(ajaxResult || '{}');
                 var codigoOperacion = datos && datos.resultado ? datos.resultado.codigoOperacion : "4";
                 
                 if (codigoOperacion == "0") {
