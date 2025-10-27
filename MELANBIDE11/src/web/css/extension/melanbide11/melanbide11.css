@@ -12,4 +12,223 @@ table.dataTable td {
     white-space: nowrap;
 }
 
+/* Estilos para formulario desglose */
+.m11-form {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+.lineaFormulario {
+    clear: both;
+    margin: 5px 0;
+    padding: 3px 0;
+}
+
+.etiquetaLPEEL {
+    float: left;
+    width: 40%;
+    text-align: right;
+    padding-right: 10px;
+    font-weight: bold;
+}
+
+.campoFormulario {
+    float: left;
+    width: 55%;
+}
+
+.inputTexto {
+    padding: 3px 5px;
+    border: 1px solid #ccc;
+    font-size: 12px;
+}
+
+.botonGeneral {
+    padding: 5px 15px;
+    margin: 0 5px;
+    background-color: #2b62b5;
+    color: white;
+    border: 1px solid #1a4a8a;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.botonGeneral:hover {
+    background-color: #1a4a8a;
+}
+
+.botonGeneral:disabled {
+    background-color: #ccc;
+    border-color: #999;
+    cursor: not-allowed;
+}
+
+/* Estilos para pestañas */
+.m11-tabs {
+    margin-top: 10px;
+}
+
+.tab-page {
+    display: none;
+    padding: 10px;
+}
+
+.tab-page.selected {
+    display: block;
+}
+
+h2.tab {
+    display: inline-block;
+    padding: 8px 15px;
+    margin: 0 2px;
+    background-color: #e0e0e0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+h2.tab.selected {
+    background-color: #2b62b5;
+    color: white;
+    border-color: #1a4a8a;
+}
+
+.tab-content-separator {
+    clear: both;
+    height: 1px;
+    background-color: #ccc;
+    margin: 10px 0;
+}
+
+/* Estilos para wrapper de desglose */
+.m11-desglose-wrapper {
+    margin: 10px 0;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.m11-loader {
+    text-align: center;
+    padding: 20px;
+    color: #2b62b5;
+    font-style: italic;
+}
+
+.m11-empty {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+    font-style: italic;
+}
+
+/* Estilos para diálogo modal */
+.m11-dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.m11-dialog {
+    background: white;
+    border: 2px solid #2b62b5;
+    border-radius: 5px;
+    padding: 0;
+    min-width: 400px;
+    max-width: 600px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.m11-dialog header {
+    background-color: #2b62b5;
+    color: white;
+    padding: 10px 15px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.m11-dialog .body {
+    padding: 15px;
+}
+
+.m11-dialog footer {
+    padding: 10px 15px;
+    text-align: right;
+    border-top: 1px solid #ccc;
+}
+
+/* Estilos para dropdown personalizado */
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.dropdown-input {
+    width: 100%;
+    cursor: pointer;
+}
+
+.dropdown-arrow {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #666;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-option {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dropdown-option:hover {
+    background-color: #e0e0e0;
+}
+
+/* Botonera centrada */
+.botonera-centro {
+    text-align: center;
+    margin: 15px 0;
+}
+
+/* Etiquetas bilingües */
+.label-bilingual .label-es::after {
+    content: " / ";
+    color: #999;
+}
+
+/* Barra de progreso */
+.contenedorHidepage {
+    text-align: center;
+    padding: 20px;
+}
+
+.textoHide {
+    margin-bottom: 10px;
+}
+
+.imagenHide {
+    font-size: 24px;
+}
 
